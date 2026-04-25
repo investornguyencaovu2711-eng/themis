@@ -1,0 +1,38 @@
+name: Tự động cập nhật biểu đồ
+
+on:
+  schedule:
+    # Chạy vào lúc 17:00 mỗi ngày (Giờ UTC là 10:00)
+    - cron: '0 10 * * *'
+  workflow_dispatch: # Cho phép bạn nhấn nút chạy thủ công để test
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Kiểm tra mã nguồn
+        uses: actions/checkout@v3
+
+      - name: Thiết lập Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+
+      - name: Cài đặt thư viện
+        run: |
+          pip install -r requirements.txt
+
+      - name: Tạo file credential từ Secret
+        run: |
+          echo '${{ secrets.GCP_SERVICE_ACCOUNT }}' > service_account.json
+
+      - name: Chạy script vẽ biểu đồ
+        run: python cap_nhat_tu_gg_sheet.py
+
+      - name: Lưu biểu đồ vào GitHub
+        run: |
+          git config --global user.name 'github-actions'
+          git config --global user.email 'github-actions@github.com'
+          git add bieudo_quy_vs_von.html
+          git commit -m "Auto-update chart: $(date)" || exit 0
+          git push
