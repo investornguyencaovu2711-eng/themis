@@ -3,7 +3,7 @@ name: Tự động cập nhật biểu đồ
 on:
   schedule:
     # Chạy vào lúc 17:00 mỗi ngày (Giờ UTC là 10:00)
-    - cron: '0 10 * * *'
+    - cron: '0 21 * * *'
   workflow_dispatch: # Cho phép bạn nhấn nút chạy thủ công để test
 
 jobs:
