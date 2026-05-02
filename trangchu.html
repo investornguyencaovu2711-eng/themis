@@ -51,91 +51,43 @@
     </style>
   </head>
   <body>
-    <div style="display: flex; justify-content: center; align-items: center">
+<body>
+    <div class="container">
       <h1>Chào mừng đến với website của quỹ</h1>
     </div>
 
-    <p>Chào mừng đến với website của tôi</p>
+    <p style="text-align: center;">Chào mừng đến với website của tôi</p>
 
-    <div style="display: flex; justify-content: center; align-items: center">
-      <iframe
-        src="thongtintongthecuaquy.html"
-        width="800"
-        height="195px"
-        x
-        scrolling="no"
-      ></iframe>
+    <!-- Khối 1 -->
+    <div class="container">
+      <iframe src="thongtintongthecuaquy.html" width="800" height="195"></iframe>
     </div>
 
-    <div
-      style="
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        margin-top: 100px;
-      "
-    >
-      <iframe
-        src="capnhatbieudotuggsheet.html"
-        width="1000"
-        height="600px"
-        scrolling="no"
-      ></iframe>
+    <!-- Khối 2 -->
+    <div class="container">
+      <iframe src="capnhatbieudotuggsheet.html" width="1000" height="600"></iframe>
     </div>
 
-    <div
-      style="
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        margin-top: 100px;
-      "
-    >
-      <iframe
-        src="BieuDoLoiNhuan.html"
-        width="1000"
-        height="600px"
-        scrolling="no"
-      ></iframe>
+    <!-- Khối 3 -->
+    <div class="container">
+      <iframe src="BieuDoLoiNhuan.html" width="1000" height="600"></iframe>
     </div>
 
-    <div
-      style="
-        /* display: flex;
-        justify-content: space-between;
-        align-items: center: ;
-        margin-top: 100px;
-		margin-right: 200px;
-		margin-left: 200px;
-		border: 2px solid black; */
-
-        display: flex;
-        justify-content: space-between;
-        flex-wrap: wrap; /* Tự xuống dòng khi màn hình hẹp */
-        gap: 20px; /* Tạo khoảng cách giữa 2 biểu đồ */
-        margin: 100px auto; /* Căn giữa cái khung div này ra giữa màn hình */
-        max-width: 1200px; /* Giới hạn độ rộng tối đa */
-        border: 2px solid black;
-        padding: 10px;
-      "
-    >
+    <!-- Khối 4: Hai biểu đồ song song -->
+    <div class="chart-group">
       <iframe
         width="554"
         height="383"
-        seamless
-        frameborder="0"
-        scrolling="no"
         src="https://docs.google.com/spreadsheets/d/e/2PACX-1vQkbAYUzyMQ7GGKptQYfIgQ6Yd5SZpAEtTcdzK3Rg23eCo3TysYOMfLefO14hY8rZq0uD59OOBCieZj/pubchart?oid=501348753&amp;format=interactive"
       ></iframe>
-      <div style="width: 2px; height: 400px; background-color: black"></div>
+      
+      <div class="divider"></div>
+      
       <iframe
         width="554"
         height="383"
-        seamless
-        frameborder="0"
-        scrolling="no"
         src="https://docs.google.com/spreadsheets/d/e/2PACX-1vQkbAYUzyMQ7GGKptQYfIgQ6Yd5SZpAEtTcdzK3Rg23eCo3TysYOMfLefO14hY8rZq0uD59OOBCieZj/pubchart?oid=1368898948&amp;format=interactive"
       ></iframe>
     </div>
-  </body>
+</body>
 </html>
