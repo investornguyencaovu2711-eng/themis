@@ -27,12 +27,12 @@ jobs:
           echo '${{ secrets.GCP_SERVICE_ACCOUNT }}' > service_account.json
 
       - name: Chạy script vẽ biểu đồ
-        run: python cap_nhat_tu_gg_sheet.py
+        run: python cap_nhat_tu_gg_sheet.py & Bieu_do_loi_nhuan.py
 
       - name: Lưu biểu đồ vào GitHub
         run: |
           git config --global user.name 'github-actions'
           git config --global user.email 'github-actions@github.com'
-          git add capnhatbieudotuggsheet.html
+          git add capnhatbieudotuggsheet.html & BieuDoLoiNhuan.html
           git commit -m "Auto-update chart: $(date)" || exit 0
           git push
