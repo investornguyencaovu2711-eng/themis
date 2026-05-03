@@ -92,4 +92,3 @@ fig.update_layout(
 
 # Hiển thị biểu đồ
 fig.write_html("capnhatbieudotuggsheet.html")
-fig.show()
