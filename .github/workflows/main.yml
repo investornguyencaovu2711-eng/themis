@@ -2,7 +2,7 @@ name: Tự động cập nhật biểu đồ
 
 on:
   schedule:
-    # Chạy vào lúc 17:00 mỗi ngày (Giờ UTC là 10:00)
+    # Chạy vào lúc 21:00 mỗi ngày (Giờ UTC là 10:00)
     - cron: '0 21 * * *'
   workflow_dispatch: # Cho phép bạn nhấn nút chạy thủ công để test
 
@@ -33,6 +33,6 @@ jobs:
         run: |
           git config --global user.name 'github-actions'
           git config --global user.email 'github-actions@github.com'
-          git add capnhatbieudotuggsheet.html
+          git add bieudo_quy_vs_von.html
           git commit -m "Auto-update chart: $(date)" || exit 0
           git push
