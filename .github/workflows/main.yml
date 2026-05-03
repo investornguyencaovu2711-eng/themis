@@ -33,6 +33,6 @@ jobs:
         run: |
           git config --global user.name 'github-actions'
           git config --global user.email 'github-actions@github.com'
-          git add capnhatbieudotuggsheet.html
+          git add bieudovonchusohuu.html
           git commit -m "Auto-update chart: $(date)" || exit 0
           git push
