@@ -27,7 +27,7 @@ jobs:
           echo '${{ secrets.GCP_SERVICE_ACCOUNT }}' > service_account.json
 
       - name: Chạy script vẽ biểu đồ
-        run: python cap_nhat_tu_gg_sheet.py
+        run: python bieudovonchusohuu.py
 
       - name: Lưu biểu đồ vào GitHub
         run: |
