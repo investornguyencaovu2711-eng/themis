@@ -7,8 +7,10 @@
     <style>
       /* Đảm bảo tất cả iframe không vượt quá chiều rộng màn hình */
       iframe {
+        width: 100%;
         max-width: 100%;
         border: none;
+        display: block;
       }
 
       /* Container cho các iframe đơn lẻ */
@@ -16,8 +18,8 @@
         display: flex;
         justify-content: center;
         align-items: center;
-        margin-top: 50px;
-        padding: 0 15px; /* Khoảng cách lề cho di động */
+        margin-top: 30px;
+        padding: 0 10px; /* Giảm padding một chút để rộng chỗ trên mobile */
       }
 
       /* Xử lý phần 2 biểu đồ nằm cạnh nhau */
@@ -26,54 +28,72 @@
         justify-content: space-around;
         flex-wrap: wrap;
         gap: 20px;
-        margin: 50px auto;
+        margin: 30px auto;
         max-width: 1200px;
         border: 2px solid black;
         padding: 10px;
       }
 
-      /* Ẩn vạch kẻ dọc khi ở màn hình điện thoại vì lúc này 2 biểu đồ sẽ xếp chồng lên nhau */
+      /* Vạch kẻ dọc giữa 2 biểu đồ */
       .divider {
         width: 2px;
         height: 400px;
         background-color: black;
       }
 
+      /* ====================================================
+         CSS TỐI ƯU RIÊNG CHO ĐIỆN THOẠI (Màn hình dưới 768px)
+         ==================================================== */
       @media (max-width: 768px) {
         .divider {
-          display: none;
+          display: none; /* Ẩn vạch kẻ dọc */
         }
+        
         h1 {
-          font-size: 1.5rem;
+          font-size: 1.3rem; /* Thu nhỏ tiêu đề vừa vặn màn hình */
           text-align: center;
+        }
+
+        .container {
+          margin-top: 20px; /* Giảm khoảng cách giữa các khối */
+        }
+
+        /* 1. Khối thông tin tổng thể: Tăng chiều cao để không bị cuộn */
+        .info-frame {
+          height: 380px !important; 
+        }
+
+        /* 2. Các khối biểu đồ lớn: Giảm chiều cao xuống để dễ nhìn */
+        .chart-frame {
+          height: 350px !important;
+        }
+
+        /* 3. Hai biểu đồ Google Sheets ở cuối */
+        .chart-group iframe {
+          height: 300px !important;
         }
       }
     </style>
   </head>
   <body>
-<body>
     <div class="container">
       <h1>Chào mừng đến với website của quỹ</h1>
     </div>
 
     <p style="text-align: center;">Chào mừng đến với website của tôi</p>
 
-    <!-- Khối 1 -->
     <div class="container">
-      <iframe src="thongtintongthecuaquy.html" width="800" height="195"></iframe>
+      <iframe class="info-frame" src="thongtintongthecuaquy.html" width="800" height="195"></iframe>
     </div>
 
-    <!-- Khối 2 -->
     <div class="container">
-      <iframe src="bieudovonchusohuu.html" width="1000" height="600"></iframe>
+      <iframe class="chart-frame" src="bieudovonchusohuu.html" width="1000" height="600"></iframe>
     </div>
 
-    <!-- Khối 3 -->
     <div class="container">
-      <iframe src="BieuDoLoiNhuan.html" width="1000" height="600"></iframe>
+      <iframe class="chart-frame" src="BieuDoLoiNhuan.html" width="1000" height="600"></iframe>
     </div>
 
-    <!-- Khối 4: Hai biểu đồ song song -->
     <div class="chart-group">
       <iframe
         width="554"
@@ -89,5 +109,5 @@
         src="https://docs.google.com/spreadsheets/d/e/2PACX-1vQkbAYUzyMQ7GGKptQYfIgQ6Yd5SZpAEtTcdzK3Rg23eCo3TysYOMfLefO14hY8rZq0uD59OOBCieZj/pubchart?oid=1368898948&amp;format=interactive"
       ></iframe>
     </div>
-</body>
+  </body>
 </html>
