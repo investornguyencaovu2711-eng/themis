@@ -30,7 +30,7 @@ jobs:
         run: |
           python bieudovonchusohuu.py
           python Bieu_do_loi_nhuan.py
-          thongtintongthecuaquy.py
+          python thongtintongthecuaquy.py
           
 
       - name: Lưu biểu đồ vào GitHub
