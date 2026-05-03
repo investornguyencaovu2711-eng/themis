@@ -137,4 +137,3 @@ fig.update_layout(
 
 # Hiển thị biểu đồ
 fig.write_html("BieuDoLoiNhuan.html")
-fig.show()
