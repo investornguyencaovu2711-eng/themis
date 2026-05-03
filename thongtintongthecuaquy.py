@@ -43,7 +43,6 @@ try:
     with open("thongtintongthecuaquy.html", "w", encoding="utf-8") as f:
         f.write(html_content)
         
-    print("Thành công! Hãy mở file report.html để xem kết quả.")
 
 except Exception as e:
     print(f"Đã xảy ra lỗi: {e}")
