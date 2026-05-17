@@ -525,6 +525,12 @@
         try {
           const response = await fetch(
             `https://quintet-rickety-scuba.ngrok-free.dev/view-database?Token=${token}`,
+            {
+              method: "GET",
+              headers: {
+                "ngrok-skip-browser-warning": "69420", // Bỏ qua trang cảnh báo của ngrok
+              },
+            },
           );
           if (!response.ok) throw new Error("Không thể kết nối tới API Flask");
 
