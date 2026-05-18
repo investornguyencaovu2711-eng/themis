@@ -2,6 +2,12 @@
   <input type="text" id="reg_user" placeholder="Tên đăng nhập" required />
   <input type="email" id="reg_email" placeholder="Email" required />
   <input type="text" id="reg_HovaTen" placeholder="Họ và tên" required />
+  <input
+    type="text"
+    id="reg_SoDienThoai"
+    placeholder="Số điện thoại"
+    required
+  />
   <input type="password" id="reg_pass" placeholder="Mật khẩu" required />
   <button type="submit">Đăng ký qua API</button>
 </form>
@@ -14,6 +20,7 @@
       username: document.getElementById("reg_user").value,
       email: document.getElementById("reg_email").value,
       HovaTen: document.getElementById("reg_HovaTen").value,
+      SoDienThoai: document.getElementById("reg_SoDienThoai").value,
       password: document.getElementById("reg_pass").value,
     };
 
