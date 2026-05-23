@@ -10,6 +10,7 @@
         --danger-color: #dc3545;
         --bg-color: #f4f4f9;
         --text-muted: #6c757d;
+        --warning-color: #ffc107;
       }
       body {
         font-family: "Segoe UI", Arial, sans-serif;
@@ -37,6 +38,12 @@
         align-items: center;
         margin-bottom: 20px;
       }
+      .section-header-flex {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px;
+      }
       h2 {
         margin: 0;
         color: #222;
@@ -60,7 +67,20 @@
       .btn-logout:hover {
         background-color: var(--danger-color);
         color: white;
-        opacity: 1;
+      }
+      .btn-download {
+        background-color: var(--success-color);
+        color: white;
+        border: none;
+        padding: 7px 14px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: background 0.2s;
+      }
+      .btn-download:hover {
+        background-color: #218838;
       }
       .user-grid {
         display: grid;
@@ -110,7 +130,6 @@
         border: 1px solid #ccc;
         border-radius: 5px;
         font-size: 1rem;
-        transition: border-color 0.2s;
       }
       input:focus {
         border-color: var(--primary-color);
@@ -119,7 +138,6 @@
       input[readonly] {
         background-color: #e9ecef;
         cursor: not-allowed;
-        color: #495057;
       }
       .btn-group {
         display: flex;
@@ -135,10 +153,6 @@
         border-radius: 5px;
         font-size: 16px;
         font-weight: 600;
-        transition: opacity 0.2s;
-      }
-      button:hover {
-        opacity: 0.9;
       }
       .btn-nop {
         background-color: var(--success-color);
@@ -147,10 +161,12 @@
         background-color: var(--danger-color);
       }
       .table-wrapper {
-        max-height: 245px;
+        max-height: 220px;
         overflow-y: auto;
         border: 1px solid #dee2e6;
         border-radius: 5px;
+        margin-bottom: 25px;
+        background: white;
       }
       table {
         width: 100%;
@@ -171,11 +187,14 @@
         z-index: 1;
         box-shadow: inset 0 -1px 0 #dee2e6;
       }
-      tr:last-child td {
-        border-bottom: none;
+      .no-data {
+        text-align: center;
+        color: var(--text-muted);
+        padding: 15px;
+        font-style: italic;
       }
 
-      /* === CSS PHẦN MODAL THÔNG TIN THANH TOÁN MỚI === */
+      /* MODAL STYLE */
       .modal-overlay {
         position: fixed;
         top: 0;
@@ -187,22 +206,14 @@
         justify-content: center;
         align-items: center;
         z-index: 9999;
-        display: none; /* Ẩn mặc định */
+        display: none;
       }
       .modal-content {
         background: white;
         padding: 30px;
         border-radius: 12px;
-        max-width: 500px;
+        max-width: 450px;
         width: 90%;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-        text-align: left;
-      }
-      .modal-content h3 {
-        margin-top: 0;
-        color: #222;
-        border-bottom: 2px solid #e9ecef;
-        padding-bottom: 10px;
         text-align: center;
       }
       .modal-info-row {
@@ -211,6 +222,7 @@
         padding: 10px 0;
         border-bottom: 1px dashed #e9ecef;
         font-size: 0.95rem;
+        text-align: left;
       }
       .modal-info-row .lbl {
         color: var(--text-muted);
@@ -263,7 +275,7 @@
             />
           </div>
           <div class="form-group">
-            <label>Số lượng CCQ:</label>
+            <label>Số lượng CCQ muốn bán / mua:</label>
             <input
               type="number"
               step="0.01"
@@ -275,58 +287,102 @@
             />
           </div>
           <div class="form-group">
-            <label>Số tiền (VNĐ):</label>
-            <input
-              type="number"
-              id="display_Tiền"
-              readonly
-              name="tien"
-              required
-            />
-          </div>
-
-          <div class="form-group" style="display: none">
-            <label>Nội dung:</label>
+            <label>Giá CCQ hôm nay (VNĐ):</label>
             <input
               type="text"
-              id="input_noi_dung"
-              name="noi_dung"
-              placeholder="Ghi chú giao dịch..."
+              id="display_gia_ccq"
               readonly
+              required
+              placeholder="0"
             />
           </div>
-
-          <input type="hidden" id="action_type" name="action_type" value="" />
+          <div class="form-group">
+            <label id="label_tien_hien_thi">Số tiền (VNĐ):</label>
+            <input
+              type="text"
+              id="display_Tiền_format"
+              readonly
+              required
+              placeholder="0"
+            />
+            <input type="hidden" id="display_Tiền" name="tien" required />
+          </div>
+          <input type="hidden" id="input_noi_dung" name="noi_dung" />
+          <input
+            type="hidden"
+            id="action_type"
+            name="action_type"
+            value="Nộp"
+          />
 
           <div class="btn-group">
-            <button type="button" class="btn-nop" onclick="submitForm('Nộp')">
-              Nộp Tiền
+            <button
+              type="button"
+              class="btn-nop"
+              onclick="selectActionType('Nộp')"
+            >
+              Nộp Tiền (Mua CCQ)
             </button>
-            <button type="button" class="btn-rut" onclick="submitForm('Rút')">
-              Rút Tiền
+            <button
+              type="button"
+              class="btn-rut"
+              onclick="selectActionType('Rút')"
+            >
+              Rút Tiền (Bán CCQ)
             </button>
           </div>
         </form>
       </div>
 
       <div class="card">
-        <h2>Lịch sử giao dịch của bạn</h2>
+        <div class="section-header-flex">
+          <h2>Giao dịch Đang xử lý</h2>
+        </div>
         <div class="table-wrapper">
-          <table id="transactionTable" style="display: none">
+          <table>
             <thead>
-              <tr id="tableHeader"></tr>
+              <tr id="pendingHeader"></tr>
             </thead>
-            <tbody id="tableBody"></tbody>
+            <tbody id="pendingBody">
+              <tr>
+                <td class="no-data">Không có giao dịch đang chờ xử lý</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="section-header-flex">
+          <h2>Giao dịch Thành công (1 năm gần nhất)</h2>
+          <button
+            type="button"
+            class="btn-download"
+            onclick="downloadAllTransactions()"
+          >
+            Tải toàn bộ lịch sử (CSV)
+          </button>
+        </div>
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr id="successHeader"></tr>
+            </thead>
+            <tbody id="successBody">
+              <tr>
+                <td class="no-data">
+                  Không có giao dịch thành công trong 1 năm qua
+                </td>
+              </tr>
+            </tbody>
           </table>
         </div>
       </div>
     </div>
 
     <div class="modal-overlay" id="paymentModal">
-      <div class="modal-content" style="max-width: 450px; text-align: center">
+      <div class="modal-content">
         <h3 id="modalTitle">THÔNG TIN XÁC NHẬN GIAO DỊCH</h3>
-
         <div
+          id="qrContainer"
           style="
             margin: 15px 0;
             padding: 10px;
@@ -339,7 +395,7 @@
           <img
             id="mQR"
             src=""
-            alt="Mã QR Chuyển tiền"
+            alt="Mã QR"
             style="width: 220px; height: 220px; display: block; margin: 0 auto"
           />
           <span
@@ -349,22 +405,21 @@
               display: block;
               margin-top: 5px;
             "
-            >Mở App Ngân hàng Quét mã để chuyển khoản nhanh</span
+            >Mở App ngân hàng quét mã QR để thanh toán</span
           >
         </div>
-
-        <div style="text-align: left; margin-bottom: 15px">
+        <div>
           <div class="modal-info-row">
-            <span class="lbl">Ngân hàng:</span>
-            <span class="val" id="mBank">Đang tải...</span>
+            <span class="lbl" id="modalBankLabel">Ngân hàng:</span
+            ><span class="val" id="mBank">-</span>
           </div>
           <div class="modal-info-row">
-            <span class="lbl">Số tài khoản:</span>
-            <span class="val" id="mAccount">Đang tải...</span>
+            <span class="lbl" id="modalAccountLabel">Số tài khoản:</span
+            ><span class="val" id="mAccount">-</span>
           </div>
           <div class="modal-info-row">
-            <span class="lbl">Số tiền giao dịch:</span>
-            <span
+            <span class="lbl" id="modalMoneyLabel">Số tiền:</span
+            ><span
               class="val"
               id="mMoney"
               style="color: var(--success-color); font-size: 1.1rem"
@@ -392,7 +447,6 @@
             >
           </div>
         </div>
-
         <button
           type="button"
           class="btn-modal-back"
@@ -402,21 +456,19 @@
         </button>
       </div>
     </div>
+
     <script>
       let globalGiaCCQ = 0;
       let globalUserData = null;
-
       const SESSION_TIMEOUT = 60 * 60 * 1000;
       let inactivityTimer;
 
       function logoutUser(isAuto = true) {
-        if (isAuto) {
+        if (isAuto)
           alert(
             "Phiên đăng nhập của bạn đã hết hạn. Hệ thống sẽ tự động thoát!",
           );
-        } else {
-          if (!confirm("Bạn có chắc chắn muốn đăng xuất không?")) return;
-        }
+        else if (!confirm("Bạn có chắc chắn muốn đăng xuất không?")) return;
         sessionStorage.clear();
         localStorage.clear();
         window.location.href = "Dangnhap.html";
@@ -428,43 +480,92 @@
       }
 
       function setupSessionSecurity() {
-        const events = [
+        [
           "mousedown",
           "mousemove",
           "keypress",
           "scroll",
           "touchstart",
           "input",
-        ];
-        events.forEach((event) =>
-          document.addEventListener(event, resetInactivityTimer, true),
+        ].forEach((ev) =>
+          document.addEventListener(ev, resetInactivityTimer, true),
         );
         resetInactivityTimer();
-        setTimeout(() => logoutUser(true), SESSION_TIMEOUT);
       }
 
       function getTokenFromUrl() {
-        const urlParams = new URLSearchParams(window.location.search);
-        return urlParams.get("Token");
+        return new URLSearchParams(window.location.search).get("Token");
+      }
+
+      function downloadAllTransactions() {
+        const token = getTokenFromUrl();
+        if (!token) return alert("Thiếu Token!");
+        window.location.href = `https://quintet-rickety-scuba.ngrok-free.dev/download-transactions?Token=${token}`;
+      }
+
+      function selectActionType(type) {
+        document.getElementById("action_type").value = type;
+        document.getElementById("label_tien_hien_thi").innerText =
+          type === "Rút" ? "Dự kiến nhận (VNĐ):" : "Số tiền (VNĐ):";
+
+        if (!validateCcqLimit()) return;
+
+        updateTotalMoney();
+        submitForm(type);
+      }
+
+      // YÊU CẦU 2: Kiểm tra chặn không cho nhập bán quá số lượng CCQ hiện có
+      function validateCcqLimit() {
+        const actionType = document.getElementById("action_type").value;
+        const ccqInput =
+          Number(document.getElementById("input_ccq").value) || 0;
+
+        if (actionType === "Rút") {
+          let availableCcq = 0;
+          if (globalUserData && globalUserData["Chứng chỉ quỹ nắm giữ (CCQ)"]) {
+            // Chuyển đổi định dạng số từ DB nếu chứa dấu phân cách hàng nghìn
+            let rawCcq = globalUserData["Chứng chỉ quỹ nắm giữ (CCQ)"]
+              .toString()
+              .replace(/\./g, "")
+              .replace(",", ".");
+            availableCcq = parseFloat(rawCcq) || 0;
+          }
+
+          if (ccqInput > availableCcq) {
+            alert(
+              `Giao dịch thất bại! Số lượng CCQ muốn bán (${ccqInput}) vượt quá số lượng CCQ hiện có của bạn (${availableCcq}).`,
+            );
+            return false;
+          }
+        }
+        return true;
       }
 
       function updateTotalMoney() {
         const ccqInput = document.getElementById("input_ccq").value;
-        const tienInput = document.getElementById("display_Tiền");
+        const tienInputHidden = document.getElementById("display_Tiền");
+        const tienInputFormat = document.getElementById("display_Tiền_format");
+        const actionType = document.getElementById("action_type").value;
 
         if (!ccqInput || ccqInput <= 0) {
-          tienInput.value = "";
+          tienInputHidden.value = "";
+          tienInputFormat.value = "";
           return;
         }
 
-        const totalMoney = Number(ccqInput) * globalGiaCCQ;
-        tienInput.value = Math.round(totalMoney);
+        let totalMoney = Number(ccqInput) * globalGiaCCQ;
+        if (actionType === "Rút") {
+          totalMoney = (totalMoney * 97) / 100; // Trừ phí rút 3%
+        }
+
+        const roundedMoney = Math.round(totalMoney);
+        tienInputHidden.value = roundedMoney;
+        tienInputFormat.value = roundedMoney.toLocaleString("vi-VN");
       }
 
       function renderUserInfo(user) {
         const container = document.getElementById("user-info-container");
         container.innerHTML = "";
-
         const fieldsConfig = [
           { key: "Tên", label: "Tên khách hàng" },
           { key: "Email", label: "Email" },
@@ -485,40 +586,106 @@
             label: "Hiệu suất",
             extraClass: "highlight-green",
           },
-          { key: "Cổ tức trả", label: "Cổ tức trả" },
           { key: "Ngân hàng", label: "Ngân hàng" },
           { key: "Số tài khoản", label: "Số tài khoản" },
         ];
 
-        fieldsConfig.forEach((field) => {
-          let rawValue = user[field.key];
-          let displayValue = rawValue;
-          let valueClass = "value " + (field.extraClass || "");
-
-          if (
-            !rawValue ||
-            (typeof rawValue === "string" && rawValue.trim() === "")
-          ) {
-            displayValue = "Chưa có dữ liệu";
-            valueClass = "value empty-value";
-          }
-
-          const boxHtml = `
+        fieldsConfig.forEach((f) => {
+          let val = user[f.key] || "Chưa có dữ liệu";
+          container.innerHTML += `
             <div class="info-box">
-                <span class="label">${field.label}</span>
-                <span class="${valueClass}">${displayValue}</span>
-            </div>
-        `;
-          container.innerHTML += boxHtml;
+                <span class="label">${f.label}</span>
+                <span class="value ${f.extraClass || ""}">${val}</span>
+            </div>`;
         });
+      }
+
+      // YÊU CẦU 1: Render 2 bảng riêng, Giao dịch thành công chỉ lấy 1 năm gần nhất
+      function renderTables(pendingRows, successRows) {
+        const pendingBody = document.getElementById("pendingBody");
+        const pendingHeader = document.getElementById("pendingHeader");
+        const successBody = document.getElementById("successBody");
+        const successHeader = document.getElementById("successHeader");
+
+        pendingHeader.innerHTML = "";
+        pendingBody.innerHTML = "";
+        successHeader.innerHTML = "";
+        successBody.innerHTML = "";
+
+        const columns = [
+          "email",
+          "tien",
+          "CCQ",
+          "Nop/Rut",
+          "NoiDungChuyenKhoan",
+          "TrangThaiGiaoDich",
+          "created_at",
+        ];
+        const colLabels = [
+          "Email",
+          "Số tiền",
+          "CCQ",
+          "Loại",
+          "Nội dung nhận",
+          "Trạng thái",
+          "Thời gian",
+        ];
+
+        colLabels.forEach((lbl) => {
+          pendingHeader.innerHTML += `<th>${lbl}</th>`;
+          successHeader.innerHTML += `<th>${lbl}</th>`;
+        });
+
+        // 1. Đổ dữ liệu vào bảng Đang Xử Lý
+        if (pendingRows && pendingRows.length > 0) {
+          pendingRows.forEach((row) => {
+            let tr = "tr";
+            columns.forEach((col) => {
+              let cellVal =
+                row[col] !== undefined
+                  ? row[col]
+                  : row[col === "Nop/Rut" ? "Nop/Rut" : ""] || "";
+              tr += `<td>${cellVal}</td>`;
+            });
+            pendingBody.innerHTML += `<tr>${tr}</tr>`;
+          });
+        } else {
+          pendingBody.innerHTML = `<tr><td colspan="${columns.length}" class="no-data">Không có giao dịch đang chờ xử lý</td></tr>`;
+        }
+
+        // 2. Đổ dữ liệu vào bảng Thành Công (Lọc giới hạn 1 năm gần nhất ở Client)
+        const oneYearAgo = new Date();
+        oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
+        let hasSuccessData = false;
+
+        if (successRows && successRows.length > 0) {
+          successRows.forEach((row) => {
+            let isWithinOneYear = true;
+            if (row["created_at"]) {
+              const txDate = new Date(row["created_at"].replace(/-/g, "/"));
+              if (txDate < oneYearAgo) isWithinOneYear = false;
+            }
+
+            if (isWithinOneYear) {
+              let tr = "";
+              columns.forEach((col) => {
+                let cellVal = row[col] !== undefined ? row[col] : "";
+                tr += `<td>${cellVal}</td>`;
+              });
+              successBody.innerHTML += `<tr>${tr}</tr>`;
+              hasSuccessData = true;
+            }
+          });
+        }
+
+        if (!hasSuccessData) {
+          successBody.innerHTML = `<tr><td colspan="${columns.length}" class="no-data">Không có giao dịch thành công trong 1 năm qua</td></tr>`;
+        }
       }
 
       async function initPage() {
         const token = getTokenFromUrl();
-        if (!token) {
-          alert("Không tìm thấy Token trên URL!");
-          return;
-        }
+        if (!token) return alert("Không tìm thấy Token xác thực trên URL!");
 
         setupSessionSecurity();
 
@@ -527,128 +694,56 @@
             `https://quintet-rickety-scuba.ngrok-free.dev/view-database?Token=${token}`,
             {
               method: "GET",
-              headers: {
-                "ngrok-skip-browser-warning": "69420", // Bỏ qua trang cảnh báo của ngrok
-              },
+              headers: { "ngrok-skip-browser-warning": "69420" },
             },
           );
-          if (!response.ok) throw new Error("Không thể kết nối tới API Flask");
+          if (!response.ok) throw new Error("Lỗi kết nối API Server.");
 
-          const data1 = await response.json();
+          const data = await response.json();
+          if (data.email)
+            document.getElementById("display_email").value = data.email;
 
-          if (data1.email) {
-            document.getElementById("display_email").value = data1.email;
+          if (data.GiaCCQ && data.GiaCCQ.length > 0) {
+            globalGiaCCQ = Number(data.GiaCCQ[0].Col_1) || 0;
+            document.getElementById("display_gia_ccq").value =
+              globalGiaCCQ.toLocaleString("vi-VN");
           }
 
-          if (data1.GiaCCQ && data1.GiaCCQ.length > 0) {
-            globalGiaCCQ = Number(data1.GiaCCQ[0].Col_1) || 0;
-          }
-
-          document.getElementById("display_Tiền").value = "";
-
-          const ccqElement = document.getElementById("input_ccq");
-          if (ccqElement) {
-            ccqElement.addEventListener("input", updateTotalMoney);
-            ccqElement.addEventListener("input", function (e) {
-              let value = e.target.value;
-              if (value < 0) {
-                value = Math.abs(value);
-                e.target.value = value;
-              }
-              if (value.toString().includes(".")) {
-                const parts = value.toString().split(".");
-                if (parts[1].length > 2) {
-                  e.target.value = parts[0] + "." + parts[1].substring(0, 2);
-                  updateTotalMoney();
-                }
-              }
-            });
-
-            ccqElement.addEventListener("keydown", function (e) {
-              if (e.key === "-" || e.key === "e" || e.key === "E") {
-                e.preventDefault();
-              }
-            });
-          }
-
-          if (data1.user_information && data1.user_information[0]) {
-            globalUserData = data1.user_information[0];
+          if (data.user_information && data.user_information[0]) {
+            globalUserData = data.user_information[0];
             renderUserInfo(globalUserData);
-          } else {
-            document.getElementById("user-info-container").innerHTML = `
-              <div class="info-box"><span class="label">Email</span><span class="value">${data1.email || "Chưa có"}</span></div>
-            `;
           }
 
-          const dataTable = data1.row;
-          if (dataTable && dataTable.length > 0) {
-            const tbody = document.getElementById("tableBody");
-            const thead = document.getElementById("tableHeader");
+          // Gọi hàm chia bảng dữ liệu mới
+          renderTables(data.pending_rows, data.success_rows);
 
-            thead.innerHTML = "";
-            tbody.innerHTML = "";
-
-            Object.keys(dataTable[0]).forEach((key) => {
-              thead.innerHTML += `<th>${key}</th>`;
-            });
-
-            dataTable.forEach((row) => {
-              let tr = "<tr>";
-              Object.values(row).forEach((val) => (tr += `<td>${val}</td>`));
-              tr += "</tr>";
-              tbody.innerHTML += tr;
-            });
-            document.getElementById("transactionTable").style.display = "table";
-          }
+          document
+            .getElementById("input_ccq")
+            .addEventListener("input", updateTotalMoney);
         } catch (err) {
-          console.error("Lỗi hệ thống:", err);
-          alert("Lỗi tải dữ liệu: " + err.message);
+          alert("Lỗi tải thông tin hệ thống: " + err.message);
+          window.location.href = "Dangnhap.html";
         }
       }
 
       function generateTransactionCode() {
-        const randomSix = Math.floor(100000 + Math.random() * 900000);
-        const now = new Date();
-        const yyyy = now.getFullYear();
-        const mm = String(now.getMonth() + 1).padStart(2, "0");
-        const dd = String(now.getDate()).padStart(2, "0");
-        const hh = String(now.getHours()).padStart(2, "0");
-        const min = String(now.getMinutes()).padStart(2, "0");
-        const ss = String(now.getSeconds()).padStart(2, "0");
-        const ms = String(now.getMilliseconds()).padStart(3, "0");
-
-        return `${randomSix}${yyyy}${mm}${dd}${hh}${min}${ss}${ms}`;
+        return Math.floor(100000 + Math.random() * 900000) + String(Date.now());
       }
 
-      // --- CẬP NHẬT HÀM XỬ LÝ KHI BẤM NỘP/RÚT TIỀN ---
       async function submitForm(type) {
         const ccqInput = document.getElementById("input_ccq").value;
         const totalMoney = document.getElementById("display_Tiền").value;
         const emailInput = document.getElementById("display_email").value;
 
         if (!ccqInput || Number(ccqInput) <= 0) {
-          alert("Vui lòng nhập số lượng CCQ hợp lệ trước khi tạo giao dịch!");
+          alert("Vui lòng nhập số lượng CCQ hợp lệ!");
           return;
         }
+        if (!validateCcqLimit()) return;
 
-        // 1. Tạo mã nội dung giao dịch ngẫu nhiên
         const generatedCode = generateTransactionCode();
         document.getElementById("input_noi_dung").value = generatedCode;
-        document.getElementById("action_type").value = type;
 
-        // Lấy thông tin tài khoản ngân hàng từ dữ liệu hệ thống (tương ứng C2, D2 của bạn)
-        const bankName =
-          globalUserData && globalUserData["Ngân hàng"]
-            ? globalUserData["Ngân hàng"]
-            : "TPBank";
-        const bankAccount =
-          globalUserData && globalUserData["Số tài khoản"]
-            ? globalUserData["Số tài khoản"]
-            : "00002716749";
-        const formattedMoney =
-          Number(totalMoney).toLocaleString("vi-VN") + " VNĐ";
-
-        // 2. Tiến hành gửi ngầm dữ liệu lên backend Flask
         try {
           const formData = new FormData();
           formData.append("email", emailInput);
@@ -664,45 +759,54 @@
               body: formData,
             },
           );
+          if (!response.ok) throw new Error("Lỗi gửi lệnh giao dịch.");
 
-          if (!response.ok) {
-            throw new Error("Gửi dữ liệu giao dịch thất bại lên máy chủ.");
-          }
-
-          // 3. Đổ dữ liệu chữ vào các ô thông tin trên Modal
-          document.getElementById("modalTitle").innerText =
-            `THÔNG TIN XÁC NHẬN CHUYỂN TIỀN (${type.toUpperCase()})`;
-          document.getElementById("mBank").innerText =
-            bankName || "Chưa cập nhật";
-          document.getElementById("mAccount").innerText =
-            bankAccount || "Chưa cập nhật";
-          document.getElementById("mMoney").innerText = formattedMoney;
-          document.getElementById("mCode").innerText = generatedCode;
-
-          // 4. GHÉP CHUỖI TẠO MÃ QR TỰ ĐỘNG (Tương tự công thức Google Sheet của bạn)
-          // Cú pháp: https://qr.sepay.vn/img?bank={Tên_Ngân_Hàng}&acc={Số_Tài_Khoản}&template=qronly&amount={Số_Tiền}&des={Nội_Dung}
-          if (bankName && bankAccount) {
-            // encodeURIComponent giúp mã hóa các ký tự đặc biệt hoặc dấu cách để link không bị lỗi
-            const qrUrl = `https://qr.sepay.vn/img?bank=${encodeURIComponent(bankName)}&acc=${encodeURIComponent(bankAccount)}&template=qronly&amount=${totalMoney}&des=${encodeURIComponent(generatedCode)}`;
-            document.getElementById("mQR").src = qrUrl;
-            document.getElementById("mQR").style.display = "block";
+          if (type === "Rút") {
+            document.getElementById("modalTitle").innerText =
+              "THÔNG TIN XÁC NHẬN RÚT TIỀN";
+            document.getElementById("modalBankLabel").innerText =
+              "Ngân hàng nhận của bạn:";
+            document.getElementById("modalAccountLabel").innerText =
+              "Số tài khoản của bạn:";
+            document.getElementById("modalMoneyLabel").innerText =
+              "Số tiền dự kiến nhận:";
+            document.getElementById("qrContainer").style.display = "none";
+            document.getElementById("mBank").innerText =
+              globalUserData["Ngân hàng"] || "Chưa có";
+            document.getElementById("mAccount").innerText =
+              globalUserData["Số tài khoản"] || "Chưa có";
           } else {
-            // Nếu không có thông tin ngân hàng thì ẩn ảnh QR hoặc hiển thị ảnh lỗi mặc định
-            document.getElementById("mQR").style.display = "none";
+            document.getElementById("modalTitle").innerText =
+              "THÔNG TIN CHUYỂN TIỀN (MUA CCQ)";
+            document.getElementById("modalBankLabel").innerText =
+              "Ngân hàng nhận:";
+            document.getElementById("modalAccountLabel").innerText =
+              "Số tài khoản:";
+            document.getElementById("modalMoneyLabel").innerText =
+              "Số tiền cần nộp:";
+            document.getElementById("qrContainer").style.display =
+              "inline-block";
+
+            const sysBank = "TPBank",
+              sysAcc = "00002716749";
+            document.getElementById("mBank").innerText = sysBank;
+            document.getElementById("mAccount").innerText = sysAcc;
+            document.getElementById("mQR").src =
+              `https://qr.sepay.vn/img?bank=${sysBank}&acc=${sysAcc}&template=qronly&amount=${totalMoney}&des=${generatedCode}`;
           }
 
-          // 5. Hiển thị Popup Modal lên màn hình
+          document.getElementById("mMoney").innerText =
+            Number(totalMoney).toLocaleString("vi-VN") + " VNĐ";
+          document.getElementById("mCode").innerText = generatedCode;
           document.getElementById("paymentModal").style.display = "flex";
         } catch (error) {
-          alert("Đã xảy ra lỗi hệ thống: " + error.message);
+          alert("Có lỗi xảy ra: " + error.message);
         }
       }
 
-      // --- HÀM QUAY LẠI VÀ RESET TRANG (GIỮ NGUYÊN TOKEN) ---
       function resetAndRefreshPage() {
-        const token = getTokenFromUrl();
-        // Thực hiện điều hướng lại trang chính kèm Token cũ -> Tự động reset và load lại data mới nhất
-        window.location.href = window.location.pathname + "?Token=" + token;
+        window.location.href =
+          window.location.pathname + "?Token=" + getTokenFromUrl();
       }
 
       document.addEventListener("DOMContentLoaded", initPage);
