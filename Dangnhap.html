@@ -1,217 +1,468 @@
-<form onsubmit="handleRegister(event)">
-  <input type="text" id="reg_user" placeholder="Tên đăng nhập" required />
-  <input type="email" id="reg_email" placeholder="Email" required />
-  <input type="text" id="reg_HovaTen" placeholder="Họ và tên" required />
-  <input
-    type="text"
-    id="reg_SoDienThoai"
-    placeholder="Số điện thoại"
-    required
-  />
-  <input type="password" id="reg_pass" placeholder="Mật khẩu" required />
-  <button type="submit">Đăng ký qua API</button>
-</form>
-
-<script>
-  async function handleRegister(event) {
-    event.preventDefault(); // Ngăn trang web tải lại
-
-    const userData = {
-      username: document.getElementById("reg_user").value,
-      email: document.getElementById("reg_email").value,
-      HovaTen: document.getElementById("reg_HovaTen").value,
-      SoDienThoai: document.getElementById("reg_SoDienThoai").value,
-      password: document.getElementById("reg_pass").value,
-    };
-
-    try {
-      const response = await fetch(
-        "https://quintet-rickety-scuba.ngrok-free.dev/register",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(userData),
-        },
-      );
-
-      const result = await response.json();
-      alert(result.message); // Hiển thị thông báo từ Python trả về
-    } catch (error) {
-      console.error("Lỗi kết nối API:", error);
-      alert("Không thể kết nối đến Server Python!");
-    }
-  }
-</script>
-
-<div class="form-container">
-  <h2>Đăng Nhập</h2>
-  <form id="loginForm">
-    <input
-      type="text"
-      id="login_user"
-      placeholder="Tên đăng nhập hoặc Email"
-      required
-    />
-    <input type="password" id="login_pass" placeholder="Mật khẩu" required />
-    <button type="submit">Đăng Nhập</button>
-  </form>
-</div>
-
-<script>
-  // Xử lý Đăng Nhập
-  document.getElementById("loginForm").addEventListener("submit", async (e) => {
-    e.preventDefault(); // Chặn việc load lại trang
-
-    const loginData = {
-      username: document.getElementById("login_user").value,
-      password: document.getElementById("login_pass").value,
-    };
-
-    try {
-      const response = await fetch(
-        "https://quintet-rickety-scuba.ngrok-free.dev/login",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(loginData),
-        },
-      );
-
-      const result = await response.json();
-
-      if (response.ok) {
-        // chuyển hướng trang tại đây:
-        // Lấy email từ kết quả API trả về (giả sử server trả về { "email": "abc@gmail.com" })
-        const userToken = result.Token;
-
-        // Chuyển hướng và đính kèm Token vào URL
-        window.location.href = `transaction_system.html?Token=${encodeURIComponent(userToken)}`;
-      } else {
-        alert(result.message);
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Hệ Thống Quản Lý Tài Chính</title>
+    <style>
+      :root {
+        --primary-color: #4f46e5;
+        --primary-hover: #4338ca;
+        --success-color: #10b981;
+        --success-hover: #059669;
+        --text-color: #1f2937;
+        --bg-color: #f3f4f6;
+        --card-bg: #ffffff;
+        --border-color: #e5e7eb;
       }
-    } catch (error) {
-      alert("Lỗi: Không thể kết nối tới Server!");
-    }
-  });
-</script>
 
-<div class="form-container">
-  <a href="#" id="toggleForgot">Quên mật khẩu?</a>
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+        font-family:
+          -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica,
+          Arial, sans-serif;
+      }
 
-  <div
-    id="forgotPasswordArea"
-    style="
-      display: none;
-      margin-top: 15px;
-      border-top: 1px solid #ddd;
-      padding-top: 15px;
-    "
-  >
-    <h3>Khôi phục mật khẩu</h3>
+      body {
+        background: linear-gradient(135deg, #e0e7ff 0%, #f3f4f6 100%);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        padding: 20px;
+      }
 
-    <div id="step1">
-      <input
-        type="email"
-        id="reset_email"
-        placeholder="Nhập Email đã đăng ký"
-        required
-      />
-      <button onclick="sendOTP()" id="btnSend">Gửi mã OTP</button>
+      .container {
+        background-color: var(--card-bg);
+        width: 100%;
+        max-width: 450px;
+        padding: 30px;
+        border-radius: 16px;
+        box-shadow:
+          0 10px 25px rgba(0, 0, 0, 0.05),
+          0 20px 48px rgba(0, 0, 0, 0.05);
+      }
+
+      /* Tabs điều hướng */
+      .tabs {
+        display: flex;
+        margin-bottom: 25px;
+        border-bottom: 2px solid var(--border-color);
+      }
+
+      .tab-btn {
+        flex: 1;
+        text-align: center;
+        padding: 12px;
+        background: none;
+        border: none;
+        font-size: 16px;
+        font-weight: 600;
+        color: #6b7280;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        border-bottom: 2px solid transparent;
+        margin-bottom: -2px;
+      }
+
+      .tab-btn.active {
+        color: var(--primary-color);
+        border-bottom: 2px solid var(--primary-color);
+      }
+
+      /* Form & Cấu trúc chung */
+      .form-panel {
+        display: none;
+      }
+
+      .form-panel.active {
+        display: block;
+      }
+
+      h2,
+      h3 {
+        color: var(--text-color);
+        margin-bottom: 20px;
+        font-weight: 700;
+      }
+
+      .form-group {
+        margin-bottom: 16px;
+      }
+
+      input[type="text"],
+      input[type="email"],
+      input[type="password"] {
+        width: 100%;
+        padding: 12px 16px;
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        font-size: 15px;
+        background-color: #f9fafb;
+        color: var(--text-color);
+        transition: all 0.2s ease;
+        outline: none;
+      }
+
+      input:focus {
+        border-color: var(--primary-color);
+        background-color: #fff;
+        box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+      }
+
+      button {
+        width: 100%;
+        padding: 12px;
+        background-color: var(--primary-color);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background-color 0.2s ease;
+        margin-top: 8px;
+      }
+
+      button:hover {
+        background-color: var(--primary-hover);
+      }
+
+      button:disabled {
+        background-color: #9ca3af;
+        cursor: not-allowed;
+      }
+
+      /* Quên mật khẩu link */
+      .forgot-link-container {
+        text-align: right;
+        margin-top: 12px;
+      }
+
+      .forgot-link {
+        font-size: 14px;
+        color: var(--primary-color);
+        text-decoration: none;
+        font-weight: 500;
+      }
+
+      .forgot-link:hover {
+        text-decoration: underline;
+      }
+
+      /* Vùng khôi phục mật khẩu */
+      #forgotPasswordArea {
+        margin-top: 20px;
+        padding-top: 20px;
+        border-top: 1px dashed var(--border-color);
+      }
+
+      .btn-success {
+        background-color: var(--success-color);
+      }
+
+      .btn-success:hover {
+        background-color: var(--success-hover);
+      }
+
+      .info-text {
+        font-size: 13px;
+        color: #4b5563;
+        margin-bottom: 12px;
+        line-height: 1.5;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="tabs">
+        <button class="tab-btn active" onclick="switchTab('login-panel', this)">
+          Đăng nhập
+        </button>
+        <button class="tab-btn" onclick="switchTab('register-panel', this)">
+          Đăng ký
+        </button>
+      </div>
+
+      <div id="login-panel" class="form-panel active">
+        <form id="loginForm">
+          <div class="form-group">
+            <input
+              type="text"
+              id="login_user"
+              placeholder="Tên đăng nhập hoặc Email"
+              required
+            />
+          </div>
+          <div class="form-group">
+            <input
+              type="password"
+              id="login_pass"
+              placeholder="Mật khẩu"
+              required
+            />
+          </div>
+          <button type="submit">Đăng Nhập</button>
+        </form>
+
+        <div class="forgot-link-container">
+          <a href="#" class="forgot-link" id="toggleForgot">Quên mật khẩu?</a>
+        </div>
+
+        <div id="forgotPasswordArea" style="display: none">
+          <h3>Khôi phục mật khẩu</h3>
+
+          <div id="step1">
+            <div class="form-group">
+              <input
+                type="email"
+                id="reset_email"
+                placeholder="Nhập Email đã đăng ký"
+              />
+            </div>
+            <button type="button" onclick="sendOTP()" id="btnSend">
+              Gửi mã OTP
+            </button>
+          </div>
+
+          <div id="step2" style="display: none">
+            <p class="info-text">
+              Mã OTP đã được gửi đến email của bạn. Vui lòng kiểm tra hộp thư.
+            </p>
+            <div class="form-group">
+              <input type="text" id="otp_code" placeholder="Nhập mã OTP 6 số" />
+            </div>
+            <div class="form-group">
+              <input
+                type="password"
+                id="new_password"
+                placeholder="Mật khẩu mới"
+              />
+            </div>
+            <button
+              type="button"
+              onclick="verifyAndReset()"
+              class="btn-success"
+            >
+              Xác nhận đổi mật khẩu
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div id="register-panel" class="form-panel">
+        <form onsubmit="handleRegister(event)">
+          <div class="form-group">
+            <input
+              type="text"
+              id="reg_user"
+              placeholder="Tên đăng nhập"
+              required
+            />
+          </div>
+          <div class="form-group">
+            <input type="email" id="reg_email" placeholder="Email" required />
+          </div>
+          <div class="form-group">
+            <input
+              type="text"
+              id="reg_HovaTen"
+              placeholder="Họ và tên"
+              required
+            />
+          </div>
+          <div class="form-group">
+            <input
+              type="text"
+              id="reg_SoDienThoai"
+              placeholder="Số điện thoại"
+              required
+            />
+          </div>
+          <div class="form-group">
+            <input
+              type="password"
+              id="reg_pass"
+              placeholder="Mật khẩu"
+              required
+            />
+          </div>
+          <div class="form-group">
+            <input
+              type="text"
+              id="reg_TenNganHang"
+              placeholder="Tên ngân hàng"
+              required
+            />
+          </div>
+          <div class="form-group">
+            <input
+              type="text"
+              id="reg_SoTaiKhoan"
+              placeholder="Số tài khoản"
+              required
+            />
+          </div>
+          <button type="submit">Đăng ký tài khoản</button>
+        </form>
+      </div>
     </div>
 
-    <div id="step2" style="display: none">
-      <p style="font-size: 13px; color: #666">
-        Mã OTP đã được gửi đến email của bạn.
-      </p>
-      <input
-        type="text"
-        id="otp_code"
-        placeholder="Nhập mã OTP 6 số"
-        required
-      />
-      <input
-        type="password"
-        id="new_password"
-        placeholder="Mật khẩu mới"
-        required
-      />
-      <button onclick="verifyAndReset()" style="background-color: #28a745">
-        Xác nhận đổi mật khẩu
-      </button>
-    </div>
-  </div>
-</div>
+    <script>
+      // Hàm xử lý chuyển đổi giữa Tab Đăng Nhập và Đăng Ký
+      function switchTab(panelId, element) {
+        document
+          .querySelectorAll(".form-panel")
+          .forEach((panel) => panel.classList.remove("active"));
+        document
+          .querySelectorAll(".tab-btn")
+          .forEach((btn) => btn.classList.remove("active"));
 
-<script>
-  // Dán toàn bộ đoạn JavaScript xử lý OTP vào đây
-  // Hiện form quên mật khẩu khi nhấn link
-  document.getElementById("toggleForgot").onclick = function () {
-    const area = document.getElementById("forgotPasswordArea");
-    area.style.display = area.style.display === "none" ? "block" : "none";
-  };
+        document.getElementById(panelId).classList.add("active");
+        element.classList.add("active");
 
-  // Bước 1: Gọi API gửi OTP
-  async function sendOTP() {
-    const email = document.getElementById("reset_email").value;
-    if (!email) return alert("Vui lòng nhập email!");
-
-    const btn = document.getElementById("btnSend");
-    btn.innerText = "Đang gửi...";
-    btn.disabled = true;
-
-    try {
-      const response = await fetch(
-        "https://quintet-rickety-scuba.ngrok-free.dev/send-otp",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email: email }),
-        },
-      );
-
-      const result = await response.json();
-      if (response.ok) {
-        alert(result.message);
-        document.getElementById("step1").style.display = "none";
-        document.getElementById("step2").style.display = "block";
-      } else {
-        alert(result.message);
-        btn.innerText = "Gửi lại mã OTP";
-        btn.disabled = false;
+        // Ẩn vùng quên mật khẩu nếu chuyển qua lại
+        document.getElementById("forgotPasswordArea").style.display = "none";
       }
-    } catch (error) {
-      alert("Lỗi kết nối Server!");
-      btn.disabled = false;
-    }
-  }
 
-  // Bước 2: Gọi API xác thực và đổi mật khẩu
-  async function verifyAndReset() {
-    const data = {
-      email: document.getElementById("reset_email").value,
-      otp: document.getElementById("otp_code").value,
-      new_password: document.getElementById("new_password").value,
-    };
+      // Xử lý Đăng Ký
+      async function handleRegister(event) {
+        event.preventDefault();
 
-    try {
-      const response = await fetch(
-        "https://quintet-rickety-scuba.ngrok-free.dev/verify-and-reset",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(data),
-        },
-      );
+        const userData = {
+          username: document.getElementById("reg_user").value,
+          email: document.getElementById("reg_email").value,
+          HovaTen: document.getElementById("reg_HovaTen").value,
+          SoDienThoai: document.getElementById("reg_SoDienThoai").value,
+          password: document.getElementById("reg_pass").value,
+          TenNganHang: document.getElementById("reg_TenNganHang").value,
+          SoTaiKhoan: document.getElementById("reg_SoTaiKhoan").value,
+        };
 
-      const result = await response.json();
-      alert(result.message);
+        try {
+          const response = await fetch(
+            "https://quintet-rickety-scuba.ngrok-free.dev/register",
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(userData),
+            },
+          );
 
-      if (response.ok) {
-        location.reload(); // Đổi thành công thì tải lại trang để đăng nhập
+          const result = await response.json();
+          alert(result.message);
+        } catch (error) {
+          console.error("Lỗi kết nối API:", error);
+          alert("Không thể kết nối đến Server Python!");
+        }
       }
-    } catch (error) {
-      alert("Lỗi kết nối!");
-    }
-  }
-  // ...
-</script>
+
+      // Xử lý Đăng Nhập
+      document
+        .getElementById("loginForm")
+        .addEventListener("submit", async (e) => {
+          e.preventDefault();
+
+          const loginData = {
+            username: document.getElementById("login_user").value,
+            password: document.getElementById("login_pass").value,
+          };
+
+          try {
+            const response = await fetch(
+              "https://quintet-rickety-scuba.ngrok-free.dev/login",
+              {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(loginData),
+              },
+            );
+
+            const result = await response.json();
+
+            if (response.ok) {
+              const userToken = result.Token;
+              window.location.href = `transaction_system.html?Token=${encodeURIComponent(userToken)}`;
+            } else {
+              alert(result.message);
+            }
+          } catch (error) {
+            alert("Lỗi: Không thể kết nối tới Server!");
+          }
+        });
+
+      // Toggle Vùng Quên mật khẩu
+      document.getElementById("toggleForgot").onclick = function (e) {
+        e.preventDefault();
+        const area = document.getElementById("forgotPasswordArea");
+        area.style.display = area.style.display === "none" ? "block" : "none";
+      };
+
+      // Khôi phục mật khẩu - Bước 1: Gửi OTP
+      async function sendOTP() {
+        const email = document.getElementById("reset_email").value;
+        if (!email) return alert("Vui lòng nhập email!");
+
+        const btn = document.getElementById("btnSend");
+        btn.innerText = "Đang gửi...";
+        btn.disabled = true;
+
+        try {
+          const response = await fetch(
+            "https://quintet-rickety-scuba.ngrok-free.dev/send-otp",
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ email: email }),
+            },
+          );
+
+          const result = await response.json();
+          if (response.ok) {
+            alert(result.message);
+            document.getElementById("step1").style.display = "none";
+            document.getElementById("step2").style.display = "block";
+          } else {
+            alert(result.message);
+            btn.innerText = "Gửi lại mã OTP";
+            btn.disabled = false;
+          }
+        } catch (error) {
+          alert("Lỗi kết nối Server!");
+          btn.disabled = false;
+        }
+      }
+
+      // Khôi phục mật khẩu - Bước 2: Xác thực & Reset mật khẩu
+      async function verifyAndReset() {
+        const data = {
+          email: document.getElementById("reset_email").value,
+          otp: document.getElementById("otp_code").value,
+          new_password: document.getElementById("new_password").value,
+        };
+
+        try {
+          const response = await fetch(
+            "https://quintet-rickety-scuba.ngrok-free.dev/verify-and-reset",
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(data),
+            },
+          );
+
+          const result = await response.json();
+          alert(result.message);
+
+          if (response.ok) {
+            location.reload();
+          }
+        } catch (error) {
+          alert("Lỗi kết nối!");
+        }
+      }
+    </script>
+  </body>
+</html>
