@@ -110,6 +110,9 @@
       .highlight-green {
         color: var(--success-color);
       }
+      .highlight-danger {
+        color: var(--danger-color);
+      }
       .empty-value {
         color: var(--text-muted);
         font-style: italic;
@@ -566,6 +569,7 @@
       function renderUserInfo(user) {
         const container = document.getElementById("user-info-container");
         container.innerHTML = "";
+
         const fieldsConfig = [
           { key: "Tên", label: "Tên khách hàng" },
           { key: "Email", label: "Email" },
@@ -579,12 +583,12 @@
           {
             key: "Biên độ lãi",
             label: "Biên độ lãi",
-            extraClass: "highlight-green",
+            dynamicColor: true, // Đánh dấu để xử lý màu linh hoạt
           },
           {
             key: "Hiệu suất",
             label: "Hiệu suất",
-            extraClass: "highlight-green",
+            dynamicColor: true, // Đánh dấu để xử lý màu linh hoạt
           },
           { key: "Ngân hàng", label: "Ngân hàng" },
           { key: "Số tài khoản", label: "Số tài khoản" },
@@ -592,11 +596,23 @@
 
         fieldsConfig.forEach((f) => {
           let val = user[f.key] || "Chưa có dữ liệu";
+          let finalClass = f.extraClass || "";
+
+          // Xử lý đổi màu tự động cho Biên độ lãi và Hiệu suất
+          if (f.dynamicColor && val !== "Chưa có dữ liệu") {
+            // Kiểm tra nếu chuỗi giá trị chứa dấu "-" (số âm)
+            if (val.toString().includes("-")) {
+              finalClass = "highlight-danger";
+            } else {
+              finalClass = "highlight-green";
+            }
+          }
+
           container.innerHTML += `
-            <div class="info-box">
-                <span class="label">${f.label}</span>
-                <span class="value ${f.extraClass || ""}">${val}</span>
-            </div>`;
+      <div class="info-box">
+          <span class="label">${f.label}</span>
+          <span class="value ${finalClass}">${val}</span>
+      </div>`;
         });
       }
 
