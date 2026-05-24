@@ -14,7 +14,7 @@ client = gspread.authorize(creds)
 # Thay "Tên_File_Của_Bạn" bằng tên file Google Sheet thực tế
 try:
     sh = client.open("4.Lưu trữ Lệnh và data")
-    worksheet = sh.worksheet("Lưu trữ data quỹ")  # Lấy trang tính đầu tiên
+    worksheet = sh.worksheet("Lưu trữ data quỹ")
     all_values = worksheet.get_all_values()
     
     # Tạo DataFrame từ dữ liệu thô
@@ -34,11 +34,18 @@ def clean_currency(value):
     return value
 
 try:
-    df['Ngày'] = pd.to_datetime(df['Ngày'], format='%d/%m/%Y', errors='coerce')
+    # Bỏ format cố định để Pandas tự nhận diện thông minh (hỗ trợ cả yyyy-mm-dd và dd/mm/yyyy)
+    df['Ngày'] = pd.to_datetime(df['Ngày'], errors='coerce')
     df['Biên độ lãi'] = pd.to_numeric(df['Biên độ lãi'].apply(clean_currency), errors='coerce')
-    df = df.dropna(subset=['Ngày', 'Biên độ lãi'])
+    
+    # Xóa dòng lỗi VÀ reset lại index
+    df = df.dropna(subset=['Ngày', 'Biên độ lãi']).reset_index(drop=True)
 
-    # Giữ nguyên đơn vị VND gốc
+    # KIỂM TRA: Nếu sau khi xóa dữ liệu bị trống thì dừng lại báo lỗi thay vì crash
+    if df.empty:
+        print("CẢNH BÁO: Không có dữ liệu hợp lệ sau khi dọn dẹp! Vui lòng kiểm tra lại cột 'Ngày' và 'Biên độ lãi' trên Google Sheet.")
+        exit()
+
     df['Lãi'] = df['Biên độ lãi'].where(df['Biên độ lãi'] >= 0)
     df['Lỗ'] = df['Biên độ lãi'].where(df['Biên độ lãi'] < 0)
 
@@ -53,7 +60,7 @@ change_indices = df.index[sign_change & (df.index != df.index[0])]
 
 new_rows = []
 for idx in change_indices:
-    row_prev = df.loc[idx - 1]
+    row_prev = df.loc[idx - 1] # Sẽ không còn bị KeyError nhờ reset_index ở trên
     row_curr = df.loc[idx]
     y1, y2 = row_prev['Biên độ lãi'], row_curr['Biên độ lãi']
     if y2 != y1:
@@ -67,6 +74,7 @@ for idx in change_indices:
 df_extended = pd.concat([df, pd.DataFrame(new_rows)], ignore_index=True).sort_values('Ngày')
 df_extended['Lãi'] = df_extended['Biên độ lãi'].mask(df_extended['Biên độ lãi'] < 0)
 df_extended['Lỗ'] = df_extended['Biên độ lãi'].mask(df_extended['Biên độ lãi'] > 0)
+
 
 # --- 5. VẼ BIỂU ĐỒ ---
 fig = go.Figure()
