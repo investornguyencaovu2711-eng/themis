@@ -542,7 +542,7 @@
         submitForm(type);
       }
 
-      // YÊU CẦU 2: Kiểm tra chặn không cho nhập bán quá số lượng CCQ hiện có
+      // TỐI ƯU HÓA YÊU CẦU 2: Kiểm tra chặn triệt để khi rút quá số lượng CCQ nắm giữ
       function validateCcqLimit() {
         const actionType = document.getElementById("action_type").value;
         const ccqInput =
@@ -551,17 +551,34 @@
         if (actionType === "Rút") {
           let availableCcq = 0;
           if (globalUserData && globalUserData["Chứng chỉ quỹ nắm giữ (CCQ)"]) {
-            // Chuyển đổi định dạng số từ DB nếu chứa dấu phân cách hàng nghìn
             let rawCcq = globalUserData["Chứng chỉ quỹ nắm giữ (CCQ)"]
               .toString()
-              .replace(/\./g, "")
-              .replace(",", ".");
+              .trim();
+
+            // Xử lý loại bỏ đơn vị chữ (nếu có ví dụ "1.200 CCQ" -> "1.200")
+            rawCcq = rawCcq.replace(/[^\d.,-]/g, "");
+
+            // Chuẩn hóa định dạng số: Nếu có cả chấm và phẩy (Kiểu Việt Nam: 1.250,55)
+            if (rawCcq.includes(".") && rawCcq.includes(",")) {
+              rawCcq = rawCcq.replace(/\./g, "").replace(",", ".");
+            }
+            // Nếu chỉ có một dấu phẩy và hoạt động như dấu thập phân thương mại Quốc tế/Việt Nam lẻ
+            else if (
+              rawCcq.includes(",") &&
+              rawCcq.indexOf(",") === rawCcq.lastIndexOf(",") &&
+              rawCcq.split(",")[1].length <= 2
+            ) {
+              rawCcq = rawCcq.replace(",", ".");
+            } else {
+              rawCcq = rawCcq.replace(/\./g, ""); // Xóa chấm phân cách hàng nghìn cấu trúc chuẩn
+            }
+
             availableCcq = parseFloat(rawCcq) || 0;
           }
 
           if (ccqInput > availableCcq) {
             alert(
-              `Giao dịch thất bại! Số lượng CCQ muốn bán (${ccqInput}) vượt quá số lượng CCQ hiện có của bạn (${availableCcq}).`,
+              `Giao dịch thất bại! Số lượng CCQ muốn bán (${ccqInput.toLocaleString("vi-VN")}) vượt quá số lượng CCQ hiện có của bạn (${availableCcq.toLocaleString("vi-VN")}).`,
             );
             return false;
           }
@@ -608,12 +625,12 @@
           {
             key: "Biên độ lãi",
             label: "Biên độ lãi",
-            dynamicColor: true, // Đánh dấu để xử lý màu linh hoạt
+            dynamicColor: true,
           },
           {
             key: "Hiệu suất",
             label: "Hiệu suất",
-            dynamicColor: true, // Đánh dấu để xử lý màu linh hoạt
+            dynamicColor: true,
           },
           { key: "Ngân hàng", label: "Ngân hàng" },
           { key: "Số tài khoản", label: "Số tài khoản" },
@@ -623,9 +640,7 @@
           let val = user[f.key] || "Chưa có dữ liệu";
           let finalClass = f.extraClass || "";
 
-          // Xử lý đổi màu tự động cho Biên độ lãi và Hiệu suất
           if (f.dynamicColor && val !== "Chưa có dữ liệu") {
-            // Kiểm tra nếu chuỗi giá trị chứa dấu "-" (số âm)
             if (val.toString().includes("-")) {
               finalClass = "highlight-danger";
             } else {
@@ -641,7 +656,6 @@
         });
       }
 
-      // YÊU CẦU 1: Render 2 bảng riêng, Giao dịch thành công chỉ lấy 1 năm gần nhất
       function renderTables(pendingRows, successRows) {
         const pendingBody = document.getElementById("pendingBody");
         const pendingHeader = document.getElementById("pendingHeader");
@@ -677,7 +691,6 @@
           successHeader.innerHTML += `<th>${lbl}</th>`;
         });
 
-        // 1. Đổ dữ liệu vào bảng Đang Xử Lý
         if (pendingRows && pendingRows.length > 0) {
           pendingRows.forEach((row) => {
             let tr = "";
@@ -687,9 +700,8 @@
                   ? row[col]
                   : row[col === "Nop/Rut" ? "Nop/Rut" : ""] || "";
 
-              // Kiểm tra nếu là cột Trạng thái để gán màu tương ứng
               if (col === "TrangThaiGiaoDich") {
-                let statusClass = "status-pending"; // Mặc định bảng này là đang xử lý
+                let statusClass = "status-pending";
                 if (cellVal === "Thành công") statusClass = "status-success";
                 if (cellVal === "Đã hủy") statusClass = "status-cancelled";
 
@@ -704,7 +716,6 @@
           pendingBody.innerHTML = `<tr><td colspan="${columns.length}" class="no-data">Không có giao dịch đang chờ xử lý</td></tr>`;
         }
 
-        // 2. Đổ dữ liệu vào bảng Thành Công (Lọc giới hạn 1 năm gần nhất ở Client)
         const oneYearAgo = new Date();
         oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
         let hasSuccessData = false;
@@ -722,9 +733,8 @@
               columns.forEach((col) => {
                 let cellVal = row[col] !== undefined ? row[col] : "";
 
-                // Kiểm tra nếu là cột Trạng thái để gán màu tương ứng
                 if (col === "TrangThaiGiaoDich") {
-                  let statusClass = "status-success"; // Mặc định bảng này là thành công
+                  let statusClass = "status-success";
                   if (cellVal === "Đang xử lý" || cellVal === "Đang Xử Lý")
                     statusClass = "status-pending";
                   if (cellVal === "Đã hủy") statusClass = "status-cancelled";
@@ -776,12 +786,24 @@
             renderUserInfo(globalUserData);
           }
 
-          // Gọi hàm chia bảng dữ liệu mới
           renderTables(data.pending_rows, data.success_rows);
 
-          document
-            .getElementById("input_ccq")
-            .addEventListener("input", updateTotalMoney);
+          const ccqInputElement = document.getElementById("input_ccq");
+
+          // TỐI ƯU HÓA YÊU CẦU 1: Lắng nghe sự kiện nhập liệu để khống chế tối đa 2 chữ số thập phân
+          ccqInputElement.addEventListener("input", function (e) {
+            let val = this.value;
+
+            // Nếu chứa dấu chấm thập phân, kiểm tra số ký tự sau dấu chấm
+            if (val.includes(".")) {
+              const parts = val.split(".");
+              if (parts[1].length > 2) {
+                // Cắt bỏ phần thừa từ chữ số thứ 3 trở đi
+                this.value = parts[0] + "." + parts[1].slice(0, 2);
+              }
+            }
+            updateTotalMoney();
+          });
         } catch (err) {
           alert("Lỗi tải thông tin hệ thống: " + err.message);
           window.location.href = "Dangnhap.html";
@@ -884,23 +906,19 @@
         }
 
         try {
-          // Gọi fetch để chuyển ảnh thành dạng Blob, tránh lỗi bảo mật bẻ hướng (CORS) khi tải trực tiếp từ URL khác
           const response = await fetch(qrUrl);
           const blob = await response.blob();
           const blobUrl = URL.createObjectURL(blob);
 
-          // Tạo link ẩn để kích hoạt sự kiện tải file của trình duyệt
           const link = document.createElement("a");
           link.href = blobUrl;
-          link.download = `QR_NapTien_${txCode}.png`; // Đặt tên file theo mã giao dịch ngẫu nhiên
+          link.download = `QR_NapTien_${txCode}.png`;
           document.body.appendChild(link);
           link.click();
 
-          // Dọn dẹp bộ nhớ
           document.body.removeChild(link);
           URL.revokeObjectURL(blobUrl);
         } catch (error) {
-          // Trường hợp gặp lỗi CORS hoặc lỗi mạng, mở ảnh ở tab mới để user tự lưu thủ công
           console.error("Lỗi tải QR tự động, chuyển hướng mở tab mới:", error);
           window.open(qrUrl, "_blank");
         }
