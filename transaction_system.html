@@ -240,6 +240,21 @@
         margin-top: 20px;
         width: 100%;
       }
+      /* Định dạng màu chữ trạng thái giao dịch */
+      .status-pending {
+        color: #ffc107; /* Màu vàng */
+        font-weight: bold;
+      }
+
+      .status-success {
+        color: #28a745; /* Màu xanh lá */
+        font-weight: bold;
+      }
+
+      .status-cancelled {
+        color: #dc3545; /* Màu đỏ */
+        font-weight: bold;
+      }
     </style>
   </head>
   <body>
@@ -407,9 +422,19 @@
               color: var(--text-muted);
               display: block;
               margin-top: 5px;
+              margin-bottom: 8px;
             "
             >Mở App ngân hàng quét mã QR để thanh toán</span
           >
+
+          <button
+            type="button"
+            class="btn-download"
+            style="width: 100%; padding: 5px 0; font-size: 0.8rem"
+            onclick="downloadQR()"
+          >
+            Tải mã QR xuống
+          </button>
         </div>
         <div>
           <div class="modal-info-row">
@@ -655,12 +680,22 @@
         // 1. Đổ dữ liệu vào bảng Đang Xử Lý
         if (pendingRows && pendingRows.length > 0) {
           pendingRows.forEach((row) => {
-            let tr = "tr";
+            let tr = "";
             columns.forEach((col) => {
               let cellVal =
                 row[col] !== undefined
                   ? row[col]
                   : row[col === "Nop/Rut" ? "Nop/Rut" : ""] || "";
+
+              // Kiểm tra nếu là cột Trạng thái để gán màu tương ứng
+              if (col === "TrangThaiGiaoDich") {
+                let statusClass = "status-pending"; // Mặc định bảng này là đang xử lý
+                if (cellVal === "Thành công") statusClass = "status-success";
+                if (cellVal === "Đã hủy") statusClass = "status-cancelled";
+
+                cellVal = `<span class="${statusClass}">${cellVal}</span>`;
+              }
+
               tr += `<td>${cellVal}</td>`;
             });
             pendingBody.innerHTML += `<tr>${tr}</tr>`;
@@ -686,6 +721,17 @@
               let tr = "";
               columns.forEach((col) => {
                 let cellVal = row[col] !== undefined ? row[col] : "";
+
+                // Kiểm tra nếu là cột Trạng thái để gán màu tương ứng
+                if (col === "TrangThaiGiaoDich") {
+                  let statusClass = "status-success"; // Mặc định bảng này là thành công
+                  if (cellVal === "Đang xử lý" || cellVal === "Đang Xử Lý")
+                    statusClass = "status-pending";
+                  if (cellVal === "Đã hủy") statusClass = "status-cancelled";
+
+                  cellVal = `<span class="${statusClass}">${cellVal}</span>`;
+                }
+
                 tr += `<td>${cellVal}</td>`;
               });
               successBody.innerHTML += `<tr>${tr}</tr>`;
@@ -826,6 +872,39 @@
       }
 
       document.addEventListener("DOMContentLoaded", initPage);
+
+      async function downloadQR() {
+        const qrImg = document.getElementById("mQR");
+        const qrUrl = qrImg.src;
+        const txCode = document.getElementById("mCode").innerText;
+
+        if (!qrUrl) {
+          alert("Không tìm thấy hình ảnh mã QR để tải!");
+          return;
+        }
+
+        try {
+          // Gọi fetch để chuyển ảnh thành dạng Blob, tránh lỗi bảo mật bẻ hướng (CORS) khi tải trực tiếp từ URL khác
+          const response = await fetch(qrUrl);
+          const blob = await response.blob();
+          const blobUrl = URL.createObjectURL(blob);
+
+          // Tạo link ẩn để kích hoạt sự kiện tải file của trình duyệt
+          const link = document.createElement("a");
+          link.href = blobUrl;
+          link.download = `QR_NapTien_${txCode}.png`; // Đặt tên file theo mã giao dịch ngẫu nhiên
+          document.body.appendChild(link);
+          link.click();
+
+          // Dọn dẹp bộ nhớ
+          document.body.removeChild(link);
+          URL.revokeObjectURL(blobUrl);
+        } catch (error) {
+          // Trường hợp gặp lỗi CORS hoặc lỗi mạng, mở ảnh ở tab mới để user tự lưu thủ công
+          console.error("Lỗi tải QR tự động, chuyển hướng mở tab mới:", error);
+          window.open(qrUrl, "_blank");
+        }
+      }
     </script>
   </body>
 </html>
