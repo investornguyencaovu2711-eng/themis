@@ -608,7 +608,7 @@
       const SESSION_TIMEOUT = 60 * 60 * 1000; // 1 tiếng
       let inactivityTimer;
 
-      function logoutUser(isAuto = true) {
+      async function logoutUser(isAuto = true) {
         if (isAuto) {
           alert(
             "Phiên đăng nhập của bạn đã hết hạn. Hệ thống sẽ tự động thoát!",
@@ -616,9 +616,30 @@
         } else if (!confirm("Bạn có chắc chắn muốn đăng xuất không?")) {
           return;
         }
-        // Xóa sạch dấu vết
+
+        // Lấy Token từ URL để gửi lên server thông báo hủy session
+        const token = getTokenFromUrl();
+
+        if (token) {
+          try {
+            // Gọi API logout từ app.py
+            await fetch("https://quintet-rickety-scuba.ngrok-free.dev/logout", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({ Token: token }),
+            });
+          } catch (error) {
+            console.error("Lỗi khi gọi API đăng xuất hệ thống:", error);
+          }
+        }
+
+        // Xóa sạch dấu vết bộ nhớ trình duyệt
         sessionStorage.clear();
         localStorage.clear();
+
+        // Thoát về trang đăng nhập
         window.location.href = "Dangnhap.html";
       }
 
