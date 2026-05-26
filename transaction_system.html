@@ -672,30 +672,40 @@
               .toString()
               .trim();
 
-            // Xử lý loại bỏ đơn vị chữ (nếu có ví dụ "1.200 CCQ" -> "1.200")
-            rawCcq = rawCcq.replace(/[^\d.,-]/g, "");
-
-            // Chuẩn hóa định dạng số: Nếu có cả chấm và phẩy (Kiểu Việt Nam: 1.250,55)
-            if (rawCcq.includes(".") && rawCcq.includes(",")) {
-              rawCcq = rawCcq.replace(/\./g, "").replace(",", ".");
-            }
-            // Nếu chỉ có một dấu phẩy và hoạt động như dấu thập phân thương mại Quốc tế/Việt Nam lẻ
-            else if (
-              rawCcq.includes(",") &&
-              rawCcq.indexOf(",") === rawCcq.lastIndexOf(",") &&
-              rawCcq.split(",")[1].length <= 2
-            ) {
-              rawCcq = rawCcq.replace(",", ".");
+            // Nếu là số thuần túy hoặc chuỗi số chuẩn chỉ chứa dấu chấm thập phân (VD: 3227.50)
+            if (!isNaN(rawCcq)) {
+              availableCcq = parseFloat(rawCcq) || 0;
             } else {
-              rawCcq = rawCcq.replace(/\./g, ""); // Xóa chấm phân cách hàng nghìn cấu trúc chuẩn
-            }
+              // Trường hợp chuỗi có chứa ký tự chữ hoặc định dạng đặc biệt khác
+              rawCcq = rawCcq.replace(/[^\d.,-]/g, "");
 
-            availableCcq = parseFloat(rawCcq) || 0;
+              // Chuẩn hóa định dạng kiểu Việt Nam: 1.250,55 -> 1250.55
+              if (rawCcq.includes(".") && rawCcq.includes(",")) {
+                rawCcq = rawCcq.replace(/\./g, "").replace(",", ".");
+              }
+              // Nếu chỉ có một dấu phẩy làm dấu thập phân (VD: 3227,50)
+              else if (
+                rawCcq.includes(",") &&
+                rawCcq.indexOf(",") === rawCcq.lastIndexOf(",") &&
+                rawCcq.split(",")[1].length <= 2
+              ) {
+                rawCcq = rawCcq.replace(",", ".");
+              }
+              // Nếu chứa dấu chấm nhưng không phải số chuẩn (đề phòng phân cách hàng nghìn kiểu cũ)
+              else if (rawCcq.includes(".") && !rawCcq.includes(",")) {
+                // Chỉ xóa nếu có nhiều hơn 1 dấu chấm hoặc phần đuôi không giống số thập phân thông thường
+                const parts = rawCcq.split(".");
+                if (parts.length > 2 || parts[1].length > 2) {
+                  rawCcq = rawCcq.replace(/\./g, "");
+                }
+              }
+              availableCcq = parseFloat(rawCcq) || 0;
+            }
           }
 
           if (ccqInput > availableCcq) {
             alert(
-              `Giao dịch thất bại! Số lượng CCQ muốn bán (${ccqInput.toLocaleString("vi-VN")}) vượt quá số lượng CCQ hiện có của bạn (${availableCcq.toLocaleString("vi-VN")}).`,
+              `Giao dịch thất bại! Số lượng CCQ muốn bán (${ccqInput.toLocaleString("vi-VN", { minimumFractionDigits: 0, maximumFractionDigits: 2 })}) vượt quá số lượng CCQ hiện có của bạn (${availableCcq.toLocaleString("en-US", { minimumFractionDigits: 0, maximumFractionDigits: 2 })}).`,
             );
             return false;
           }
