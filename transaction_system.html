@@ -605,26 +605,49 @@
     <script>
       let globalGiaCCQ = 0;
       let globalUserData = null;
-      const SESSION_TIMEOUT = 60 * 60 * 1000;
+      const SESSION_TIMEOUT = 60 * 60 * 1000; // 1 tiếng
       let inactivityTimer;
 
       function logoutUser(isAuto = true) {
-        if (isAuto)
+        if (isAuto) {
           alert(
             "Phiên đăng nhập của bạn đã hết hạn. Hệ thống sẽ tự động thoát!",
           );
-        else if (!confirm("Bạn có chắc chắn muốn đăng xuất không?")) return;
+        } else if (!confirm("Bạn có chắc chắn muốn đăng xuất không?")) {
+          return;
+        }
+        // Xóa sạch dấu vết
         sessionStorage.clear();
         localStorage.clear();
         window.location.href = "Dangnhap.html";
       }
 
+      // Hàm kiểm tra xem đã hết hạn chưa (dùng khi reload hoặc mở lại trang)
+      function checkSessionExpiry() {
+        const lastActive = localStorage.getItem("lastActiveTime");
+        if (lastActive) {
+          const elapsed = Date.now() - parseInt(lastActive, 10);
+          if (elapsed >= SESSION_TIMEOUT) {
+            logoutUser(true);
+            return true; // Đã hết hạn
+          }
+        }
+        return false; // Vẫn hợp lệ
+      }
+
       function resetInactivityTimer() {
+        // 1. Cập nhật mốc thời gian thực tế vào localStorage để lưu lại kể cả khi tắt trình duyệt
+        localStorage.setItem("lastActiveTime", Date.now().toString());
+
+        // 2. Vẫn giữ bộ đếm realtime nếu người dùng đang treo máy bật tab
         clearTimeout(inactivityTimer);
         inactivityTimer = setTimeout(() => logoutUser(true), SESSION_TIMEOUT);
       }
 
       function setupSessionSecurity() {
+        // Kiểm tra ngay lúc vừa vào trang/reload trang xem đã quá 1 tiếng chưa
+        if (checkSessionExpiry()) return;
+
         [
           "mousedown",
           "mousemove",
@@ -635,6 +658,7 @@
         ].forEach((ev) =>
           document.addEventListener(ev, resetInactivityTimer, true),
         );
+
         resetInactivityTimer();
       }
 
