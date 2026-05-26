@@ -382,17 +382,19 @@
 
             const result = await response.json();
 
-            if (response.ok) {
+            if (result.status === "error") {
+              // Nếu Backend trả về status là error (do bảo trì hoặc sai pass)
+              alert(result.message);
+            } else {
+              // Nếu thành công (Trả về Token)
               const userToken = result.Token;
               window.location.href = `transaction_system.html?Token=${encodeURIComponent(userToken)}`;
-            } else {
-              alert(result.message);
             }
           } catch (error) {
+            console.error(error);
             alert("Lỗi: Không thể kết nối tới Server!");
           }
         });
-
       // Toggle Vùng Quên mật khẩu
       document.getElementById("toggleForgot").onclick = function (e) {
         e.preventDefault();
