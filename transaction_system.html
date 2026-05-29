@@ -369,7 +369,9 @@
         <div class="card-header-flex">
           <h2>Thông Tin Tài Khoản</h2>
           <div class="header-actions">
-            <a href="http://127.0.0.1:5000/dashboardquy" class="btn-dashboard"
+            <a
+              href="https://quintet-rickety-scuba.ngrok-free.dev/dashboardquy"
+              class="btn-dashboard"
               >📈 Xem Dashboard Quỹ</a
             >
             <button
@@ -609,7 +611,7 @@
       async function logoutUser() {
         const token = getToken();
         try {
-          await fetch("http://127.0.0.1:5000/logout", {
+          await fetch("https://quintet-rickety-scuba.ngrok-free.dev/logout", {
             method: "POST",
             headers: { "X-Token": token },
           });
@@ -671,7 +673,8 @@
 
         try {
           const response = await fetch(
-            "http://127.0.0.1:5000/download-transactions?Token=" + token,
+            "https://quintet-rickety-scuba.ngrok-free.dev/download-transactions?Token=" +
+              token,
             {
               method: "GET",
             },
@@ -938,7 +941,7 @@
         try {
           // ĐÃ SỬA: Sửa lại URL chính xác (bỏ chữ database viết lỗi ở đầu)
           const response = await fetch(
-            `http://127.0.0.1:5000/view-database?Token=${token}`,
+            `https://quintet-rickety-scuba.ngrok-free.dev/view-database?Token=${token}`,
             {
               method: "GET",
               headers: { "ngrok-skip-browser-warning": "69420" },
@@ -1007,7 +1010,7 @@
           formData.append("noi_dung", generatedCode);
 
           const response = await fetch(
-            "http://127.0.0.1:5000/create-transaction",
+            "https://quintet-rickety-scuba.ngrok-free.dev/create-transaction",
             {
               method: "POST",
               body: formData,
