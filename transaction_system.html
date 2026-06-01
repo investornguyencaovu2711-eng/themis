@@ -2,7 +2,7 @@
 <html lang="vi">
   <head>
     <meta charset="UTF-8" />
-    <title>Hệ thống Giao dịch Nội bộ</title>
+    <title>Trang chủ</title>
     <style>
       :root {
         --primary-color: #00ff88;
@@ -363,7 +363,7 @@
   </head>
   <body>
     <div class="container">
-      <div class="main-title">HỆ THỐNG GIAO DỊCH NỘI BỘ</div>
+      <div class="main-title">HỆ THỐNG GIAO DỊCH</div>
 
       <div class="card">
         <div class="card-header-flex">
@@ -929,7 +929,6 @@
         }
       }
 
-      // ĐÃ THÊM: từ khóa async ở đầu hàm
       async function initPage() {
         const token = sessionStorage.getItem("secure_token");
         if (!token) {
@@ -939,7 +938,6 @@
         }
 
         try {
-          // ĐÃ SỬA: Sửa lại URL chính xác (bỏ chữ database viết lỗi ở đầu)
           const response = await fetch(
             `https://quintet-rickety-scuba.ngrok-free.dev/view-database?Token=${token}`,
             {
