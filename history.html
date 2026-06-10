@@ -30,6 +30,9 @@
         flex-direction: column;
         overflow: hidden; /* Khóa hoàn toàn thanh cuộn tổng của toàn bộ màn hình */
         border-radius: 24px;
+        position: relative; /* Làm gốc định vị cho menu đáy */
+        overflow-y: auto; /* Cho phép toàn bộ trang cuộn mượt mà */
+        padding-bottom: 60px; /* Khoảng trống bằng đúng chiều cao menu */
       }
       @media (max-width: 450px) {
         .phone-container {
@@ -137,9 +140,12 @@
         display: flex;
         justify-content: space-around;
         align-items: center;
-        position: sticky;
-        bottom: 0;
         flex-shrink: 0;
+        position: absolute; /* Ghim tuyệt đối */
+        bottom: 0;
+        left: 0;
+        width: 100%; /* Trải dài hết chiều ngang khung chứa */
+        z-index: 999; /* Đảm bảo luôn nổi lên trên nội dung */
       }
       .nav-item {
         font-size: 11px;
