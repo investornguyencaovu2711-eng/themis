@@ -258,6 +258,7 @@
           const res = await fetch(`${API_BASE_URL}/profile`, {
             method: "GET",
             credentials: "include",
+            headers: { "ngrok-skip-browser-warning": "69420" },
           });
           if (!res.ok) {
             window.location.href = "login.html";
@@ -361,6 +362,7 @@
               const profileRes = await fetch(`${API_BASE_URL}/profile`, {
                 method: "GET",
                 credentials: "include",
+                headers: { "ngrok-skip-browser-warning": "69420" },
               });
               const profileData = await profileRes.json();
               const userEmail = profileData.user_information.Email || "";
