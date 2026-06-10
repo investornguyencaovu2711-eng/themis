@@ -1,0 +1,416 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Giao dịch CCQ</title>
+    <style>
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+        font-family:
+          -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      }
+      body {
+        background-color: #f4f6f9;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+      }
+      .phone-container {
+        width: 100%;
+        max-width: 412px;
+        height: 100vh;
+        max-height: 892px;
+        background-color: #ffffff;
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+        display: flex;
+        flex-direction: column;
+        overflow-y: auto;
+        border-radius: 24px;
+      }
+      @media (max-width: 450px) {
+        .phone-container {
+          border-radius: 0;
+          max-height: 100vh;
+        }
+      }
+      .header {
+        padding: 20px;
+        display: flex;
+        align-items: center;
+        border-bottom: 1px solid #e2e8f0;
+      }
+      .back-btn {
+        font-size: 20px;
+        cursor: pointer;
+        margin-right: 15px;
+        text-decoration: none;
+        color: #1a202c;
+      }
+      .header-title {
+        font-size: 18px;
+        font-weight: 700;
+        color: #1a202c;
+      }
+      .content {
+        padding: 20px;
+        flex: 1;
+      }
+      .info-box {
+        background-color: #f8fafc;
+        border-radius: 12px;
+        padding: 15px;
+        margin-bottom: 20px;
+        border: 1px solid #e2e8f0;
+        font-size: 14px;
+      }
+      .info-row {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 8px;
+      }
+      .info-row:last-child {
+        margin-bottom: 0;
+      }
+      .info-label {
+        color: #64748b;
+      }
+      .info-value {
+        font-weight: 600;
+        color: #1e293b;
+      }
+      .form-group {
+        margin-bottom: 20px;
+      }
+      label {
+        display: block;
+        font-size: 14px;
+        font-weight: 600;
+        color: #475569;
+        margin-bottom: 8px;
+      }
+      .input-wrapper {
+        position: relative;
+        display: flex;
+        align-items: center;
+      }
+      input {
+        width: 100%;
+        padding: 12px 16px;
+        border: 1px solid #cbd5e1;
+        border-radius: 10px;
+        font-size: 16px;
+        font-weight: 600;
+        outline: none;
+        transition: border-color 0.2s;
+      }
+      input:focus {
+        border-color: #2563eb;
+      }
+      .input-unit {
+        position: absolute;
+        right: 16px;
+        font-size: 14px;
+        font-weight: bold;
+        color: #94a3b8;
+      }
+      .hint-text {
+        font-size: 12px;
+        color: #64748b;
+        margin-top: 6px;
+      }
+      .btn-submit {
+        width: 100%;
+        padding: 14px;
+        border: none;
+        border-radius: 12px;
+        font-size: 16px;
+        font-weight: 700;
+        color: white;
+        cursor: pointer;
+        transition: background-color 0.2s;
+        margin-top: 10px;
+      }
+      .btn-nap {
+        background-color: #22c55e;
+      }
+      .btn-nap:hover {
+        background-color: #16a34a;
+      }
+      .btn-rut {
+        background-color: #dc2626;
+      }
+      .btn-rut:hover {
+        background-color: #b91c1c;
+      }
+
+      input[type="number"]::-webkit-inner-spin-button,
+      input[type="number"]::-webkit-outer-spin-button {
+        -webkit-appearance: opacity !important;
+        opacity: 1 !important;
+        position: relative;
+        right: 50px; /* Tránh đè lên chữ CCQ ở góc phải */
+        cursor: pointer;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="phone-container">
+      <div class="header">
+        <a href="trangchu.html" class="back-btn">🔙</a>
+        <div class="header-title" id="txtTitle">Giao dịch</div>
+      </div>
+
+      <div class="content">
+        <div class="info-box">
+          <div class="info-row">
+            <span class="info-label">Giá CCQ hiện tại:</span>
+            <span class="info-value" id="lblGiaCCQ">đang tải...</span>
+          </div>
+          <div class="info-row" id="rowKhaDung">
+            <span class="info-label" id="lblKhaDungText">Số dư khả dụng:</span>
+            <span class="info-value" id="lblKhaDungVal">đang tải...</span>
+          </div>
+        </div>
+
+        <form id="transactionForm">
+          <div class="form-group">
+            <label id="lblInputAmount">Số lượng CCQ muốn giao dịch</label>
+            <div class="input-wrapper">
+              <input
+                type="number"
+                id="txtCCQ"
+                step="0.01"
+                min="0.01"
+                required
+                placeholder="0.00"
+              />
+              <span class="input-unit">CCQ</span>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Số tiền ước tính quy đổi</label>
+            <div class="input-wrapper">
+              <input
+                type="text"
+                id="txtTien"
+                readonly
+                style="background-color: #f1f5f9; color: #475569"
+              />
+              <span class="input-unit">VND</span>
+            </div>
+            <div class="hint-text">
+              * Số tiền tự động quy đổi dựa trên công thức: Số lượng CCQ × Giá
+              CCQ.
+            </div>
+          </div>
+
+          <button type="submit" class="btn-submit" id="btnAction">
+            Xác nhận
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <script>
+      const API_BASE_URL = "https://quintet-rickety-scuba.ngrok-free.dev";
+      let giaCCQ = 0;
+      let ccqNamGiu = 0;
+      let actionType = "nap";
+      let thucTeSoTien = 0; // Biến phụ để lưu giá trị số nguyên nguyên bản phục vụ đẩy lên API
+
+      // 1. Phân tích tham số từ URL (?action=nap hoặc ?action=rut)
+      function initActionType() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const action = urlParams.get("action");
+        if (action === "rut") {
+          actionType = "rut";
+          document.getElementById("txtTitle").innerText = "Rút tiền (Bán CCQ)";
+          document.getElementById("lblKhaDungText").innerText =
+            "CCQ đang nắm giữ:";
+          document.getElementById("lblInputAmount").innerText =
+            "Số lượng CCQ muốn BÁN";
+          document.getElementById("btnAction").innerText = "Xác nhận RÚT TIỀN";
+          document.getElementById("btnAction").classList.add("btn-rut");
+
+          // Cập nhật lại dòng ghi chú công thức cho lệnh Bán
+          document.querySelector(".hint-text").innerText =
+            "Bán CCQ sẽ mất phí 3%";
+        } else {
+          actionType = "nap";
+          document.getElementById("txtTitle").innerText = "Nạp tiền (Mua CCQ)";
+          document.getElementById("lblKhaDungText").innerText =
+            "Tài sản ròng hiện tại:";
+          document.getElementById("lblInputAmount").innerText =
+            "Số lượng CCQ muốn MUA";
+          document.getElementById("btnAction").innerText = "Xác nhận NẠP TIỀN";
+          document.getElementById("btnAction").classList.add("btn-nap");
+        }
+      }
+
+      // 2. Tải thông tin tài sản và Giá CCQ từ API Profile
+      async function loadProfileData() {
+        try {
+          const res = await fetch(`${API_BASE_URL}/profile`, {
+            method: "GET",
+            credentials: "include",
+          });
+          if (!res.ok) {
+            window.location.href = "login.html";
+            return;
+          }
+          const data = await res.json();
+
+          giaCCQ = parseFloat(data.GiaCCQ);
+          // Định dạng hiển thị giá quỹ phân tách dấu phẩy hàng nghìn
+          document.getElementById("lblGiaCCQ").innerText =
+            giaCCQ.toLocaleString("en-US") + " VND / CCQ";
+
+          const info = data.user_information;
+          ccqNamGiu = parseFloat(info["Chứng chỉ quỹ nắm giữ (CCQ)"] || 0);
+
+          if (actionType === "rut") {
+            document.getElementById("lblKhaDungVal").innerText =
+              ccqNamGiu.toFixed(2) + " CCQ";
+          } else {
+            document.getElementById("lblKhaDungVal").innerText =
+              info["Giá trị tài sản ròng"];
+          }
+        } catch (err) {
+          console.error("Lỗi tải thông tin cấu hình:", err);
+          alert("Không thể kết nối đến máy chủ.");
+        }
+      }
+
+      // 3. Lắng nghe hành vi nhập liệu CCQ (Xử lý đồng thời giới hạn thập phân & Định dạng tiền tệ)
+      document.getElementById("txtCCQ").addEventListener("input", function () {
+        let valueStr = this.value;
+
+        // Cơ chế 1: Kiểm tra và cắt chuỗi nếu người dùng cố ý nhập quá 2 chữ số thập phân
+        if (valueStr.includes(".")) {
+          const parts = valueStr.split(".");
+          if (parts[1].length > 2) {
+            // Chỉ lấy phần nguyên và đúng 2 chữ số thập phân đầu tiên, loại bỏ số thứ 3 trở đi
+            valueStr = parts[0] + "." + parts[1].slice(0, 2);
+            this.value = valueStr;
+          }
+        }
+
+        const ccqInput = parseFloat(valueStr) || 0;
+
+        // Cơ chế 2: Tính toán tiền quy đổi dựa theo loại giao dịch
+        if (actionType === "rut") {
+          // Lệnh bán: Số tiền = Giá CCQ * Số CCQ * 97%
+          thucTeSoTien = Math.round(ccqInput * giaCCQ * 0.97);
+        } else {
+          // Lệnh nạp: Số tiền = Giá CCQ * Số CCQ
+          thucTeSoTien = Math.round(ccqInput * giaCCQ);
+        }
+
+        // Định dạng phân tách hàng nghìn (VD: 1,000,000) hiển thị lên giao diện
+        document.getElementById("txtTien").value =
+          thucTeSoTien.toLocaleString("en-US");
+      });
+
+      // 4. Xử lý sự kiện Submit Form gửi dữ liệu sang API /create-transaction
+      document
+        .getElementById("transactionForm")
+        .addEventListener("submit", async function (e) {
+          e.preventDefault();
+
+          let ccqValue = parseFloat(document.getElementById("txtCCQ").value);
+          ccqValue = Math.round(ccqValue * 100) / 100;
+
+          if (!ccqValue || ccqValue <= 0) {
+            alert("Vui lòng nhập số lượng CCQ hợp lệ lớn hơn 0!");
+            return;
+          }
+
+          if (actionType === "rut" && ccqValue > ccqNamGiu) {
+            alert(
+              `Bạn không đủ số dư CCQ để thực hiện giao dịch này! Tối đa: ${ccqNamGiu.toFixed(2)} CCQ.`,
+            );
+            return;
+          }
+
+          // Tạo mã nội dung chuyển khoản cố định để đồng bộ giữa API và trang biên lai
+          const maNoiDung =
+            Math.floor(100000 + Math.random() * 900000) + String(Date.now());
+
+          const formData = new FormData();
+          formData.append("tien", thucTeSoTien);
+          formData.append("ccq", ccqValue);
+          formData.append("action_type", actionType === "nap" ? "Nộp" : "Rút");
+          formData.append("noi_dung", maNoiDung);
+
+          try {
+            const res = await fetch(`${API_BASE_URL}/create-transaction`, {
+              method: "POST",
+              body: formData,
+              credentials: "include",
+            });
+
+            const resultText = await res.text();
+
+            if (res.status === 200) {
+              // Tải lại thông tin tài khoản đang đăng nhập để truyền sang trang hóa đơn
+              const profileRes = await fetch(`${API_BASE_URL}/profile`, {
+                method: "GET",
+                credentials: "include",
+              });
+              const profileData = await profileRes.json();
+              const userEmail = profileData.user_information.Email || "";
+
+              // Xác định Ngân hàng và Số tài khoản hiển thị theo logic nộp / rút của bạn
+              let nganHangHienThi = "";
+              let soTaiKhoanHienThi = "";
+
+              if (actionType === "rut") {
+                // Lệnh RÚT: Lấy từ thông tin cấu hình cá nhân trong user_information
+                nganHangHienThi =
+                  profileData.user_information["Ngân hàng"] || "TPBank";
+                soTaiKhoanHienThi =
+                  profileData.user_information["Số tài khoản"] || "";
+              } else {
+                // Lệnh NỘP: Lấy thông tin tài khoản thụ hưởng cố định của hệ thống / quỹ
+                nganHangHienThi = "TPBank";
+                soTaiKhoanHienThi = "00002716749";
+              }
+
+              // Đóng gói toàn bộ thông tin đẩy qua trang mới qua URL parameters
+              const params = new URLSearchParams({
+                email: userEmail,
+                action:
+                  actionType === "nap"
+                    ? "Nộp tiền (Mua CCQ)"
+                    : "Rút tiền (Bán CCQ)",
+                bank: nganHangHienThi,
+                account: soTaiKhoanHienThi,
+                amount: thucTeSoTien,
+                content: maNoiDung,
+                ccq: ccqValue,
+              });
+
+              // Nhảy sang trang thông tin giao dịch mới
+              window.location.href =
+                "transactioninfo.html?" + params.toString();
+            } else {
+              alert("Giao dịch thất bại: " + resultText);
+            }
+          } catch (error) {
+            console.error("Lỗi hệ thống khi tạo lệnh:", error);
+            alert("Có lỗi xảy ra trong quá trình gửi lệnh.");
+          }
+        });
+
+      document.addEventListener("DOMContentLoaded", () => {
+        initActionType();
+        loadProfileData();
+      });
+    </script>
+  </body>
+</html>

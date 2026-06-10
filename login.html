@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Đăng nhập</title>
+    <style>
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+        font-family:
+          -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica,
+          Arial, sans-serif;
+      }
+      body {
+        background-color: #f4f6f9;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+      }
+      .phone-container {
+        width: 100%;
+        max-width: 412px;
+        height: 100vh;
+        max-height: 892px;
+        background-color: #ffffff;
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        padding: 40px 24px;
+        border-radius: 24px;
+      }
+      .brand-logo .logo-img {
+        width: 150px; /* Chiều rộng của logo */
+        height: auto; /* Tự động điều chỉnh chiều cao theo tỷ lệ */
+        margin-top: 15px; /* Khoảng cách phía trên giữa chữ và logo */
+        display: block;
+        margin-left: auto; /* Căn giữa logo */
+        margin-right: auto; /* Căn giữa logo */
+      }
+      @media (max-width: 450px) {
+        .phone-container {
+          border-radius: 0;
+          max-height: 100vh;
+        }
+      }
+      .brand-logo {
+        text-align: center;
+        margin-bottom: 40px;
+      }
+      .brand-logo h1 {
+        color: #1a56db;
+        font-size: 36px;
+        font-weight: 800;
+        letter-spacing: -0.5px;
+      }
+      .brand-logo span {
+        color: #00c49f;
+      }
+      .login-card h2 {
+        font-size: 20px;
+        margin-bottom: 24px;
+        color: #1e293b;
+        font-weight: 700;
+      }
+      .form-group {
+        margin-bottom: 18px;
+      }
+      .form-group label {
+        display: block;
+        font-size: 13px;
+        font-weight: 600;
+        color: #64748b;
+        margin-bottom: 6px;
+      }
+      .form-group input {
+        width: 100%;
+        padding: 12px 14px;
+        border: 1px solid #cbd5e1;
+        border-radius: 10px;
+        font-size: 15px;
+        outline: none;
+      }
+      .form-group input:focus {
+        border-color: #1a56db;
+        box-shadow: 0 0 0 3px rgba(26, 86, 219, 0.1);
+      }
+      .btn-login {
+        width: 100%;
+        padding: 14px;
+        background-color: #1a56db;
+        color: white;
+        border: none;
+        border-radius: 10px;
+        font-size: 16px;
+        font-weight: 700;
+        cursor: pointer;
+        margin-top: 10px;
+      }
+      .login-alert {
+        padding: 12px;
+        border-radius: 8px;
+        font-size: 13px;
+        margin-bottom: 16px;
+        display: none;
+        background-color: #fde8e8;
+        color: #9b1c1c;
+        border: 1px solid #f8b4b4;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="phone-container">
+      <div class="brand-logo">
+        <img src="logo.webp" alt="Themis logo" class="logo-img" />
+      </div>
+
+      <div class="login-card">
+        <h2>Đăng nhập</h2>
+        <div id="loginAlert" class="login-alert"></div>
+        <form id="loginForm">
+          <div class="form-group">
+            <label>TÊN ĐĂNG NHẬP / EMAIL</label>
+            <input type="text" id="username" required value="" />
+          </div>
+          <div class="form-group">
+            <label>MẬT KHẨU</label>
+            <input type="password" id="password" required value="" />
+          </div>
+          <button type="submit" class="btn-login" id="btnLogin">
+            Đăng nhập
+          </button>
+        </form>
+      </div>
+    </div>
+    <script>
+      const API_BASE_URL = "https://quintet-rickety-scuba.ngrok-free.dev";
+      document
+        .getElementById("loginForm")
+        .addEventListener("submit", async (e) => {
+          e.preventDefault();
+          const alertBox = document.getElementById("loginAlert");
+          const btn = document.getElementById("btnLogin");
+          alertBox.style.display = "none";
+          btn.disabled = true;
+          btn.innerText = "Đang xác thực...";
+          try {
+            const res = await fetch(`${API_BASE_URL}/login`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              credentials: "include",
+              body: JSON.stringify({
+                username: document.getElementById("username").value,
+                password: document.getElementById("password").value,
+              }),
+            });
+            const data = await res.json();
+            if (res.ok) {
+              window.location.href = "trangchu.html";
+            } else {
+              alertBox.innerText = data.message || "Sai thông tin!";
+              alertBox.style.display = "block";
+              btn.disabled = false;
+              btn.innerText = "Đăng nhập";
+            }
+          } catch {
+            alertBox.innerText = "Lỗi kết nối máy chủ!";
+            alertBox.style.display = "block";
+            btn.disabled = false;
+            btn.innerText = "Đăng nhập";
+          }
+        });
+    </script>
+  </body>
+</html>

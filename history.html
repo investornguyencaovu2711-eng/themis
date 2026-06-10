@@ -1,0 +1,277 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Lịch sử giao dịch</title>
+    <style>
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+        font-family:
+          -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      }
+      body {
+        background-color: #f4f6f9;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+      }
+      .phone-container {
+        width: 100%;
+        max-width: 412px;
+        height: 100vh;
+        max-height: 892px;
+        background-color: #ffffff;
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+        display: flex;
+        flex-direction: column;
+        overflow: hidden; /* Khóa hoàn toàn thanh cuộn tổng của toàn bộ màn hình */
+        border-radius: 24px;
+      }
+      @media (max-width: 450px) {
+        .phone-container {
+          border-radius: 0;
+          max-height: 100vh;
+        }
+      }
+
+      .page-header {
+        padding: 24px 20px 12px 20px;
+        background-color: #ffffff;
+        border-bottom: 1px solid #f1f5f9;
+      }
+      .page-title {
+        font-size: 22px;
+        font-weight: 700;
+        color: #1e293b;
+      }
+
+      .content {
+        padding: 0 16px 24px 16px;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden; /* Không cho cuộn ở vùng content bên ngoài */
+      }
+      .sec-title {
+        font-size: 14px;
+        font-weight: 700;
+        color: #2d3748;
+        margin: 16px 0 12px 4px;
+        flex-shrink: 0;
+      }
+
+      /* ĐƯA THANH CUỘN VÀO BÊN TRONG TỪNG HỘP GIAO DỊCH */
+      .tx-box {
+        background: #fff;
+        border-radius: 14px;
+        border: 1px solid #e2e8f0;
+        padding: 12px;
+        margin-bottom: 16px;
+
+        /* Cấu hình cuộn nội bộ */
+        max-height: 240px; /* Giới hạn chiều cao tối đa của hộp, bạn có thể chỉnh lại số này */
+        overflow-y: auto; /* Tự động xuất hiện thanh cuộn riêng khi danh sách quá dài */
+        flex-shrink: 1; /* Cho phép hộp co giãn linh hoạt theo màn hình */
+      }
+
+      /* Tùy chỉnh thanh cuộn nhỏ gọn, tinh tế hơn (chỉ hiển thị trên các trình duyệt Webkit) */
+      .tx-box::-webkit-scrollbar {
+        width: 4px;
+      }
+      .tx-box::-webkit-scrollbar-thumb {
+        background-color: #cbd5e1;
+        border-radius: 4px;
+      }
+
+      .tx-item {
+        display: flex;
+        justify-content: space-between;
+        padding: 8px 0;
+        border-bottom: 1px dashed #e2e8f0;
+      }
+      .tx-item:last-child {
+        border-bottom: none;
+      }
+      .tx-title {
+        font-size: 13px;
+        font-weight: 600;
+      }
+      .tx-date {
+        font-size: 11px;
+        color: #94a3b8;
+      }
+      .status {
+        font-size: 10px;
+        padding: 2px 6px;
+        border-radius: 4px;
+        background: #def7ec;
+        color: #03543f;
+        font-weight: 600;
+        display: inline-block;
+        margin-top: 4px;
+      }
+      .status-pending {
+        background: #fef3c7;
+        color: #92400e;
+      }
+      .status-cancel {
+        background: #fde8e8;
+        color: #9b1c1c;
+      }
+      .empty-tx {
+        font-size: 13px;
+        color: #94a3b8;
+        text-align: center;
+        padding: 12px 0;
+      }
+
+      /* Thanh menu điều hướng dưới đáy khớp hoàn toàn với trangchu.html */
+      .bottom-nav {
+        height: 60px;
+        border-top: 1px solid #e2e8f0;
+        background: white;
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+        position: sticky;
+        bottom: 0;
+        flex-shrink: 0;
+      }
+      .nav-item {
+        font-size: 11px;
+        color: #94a3b8;
+        cursor: pointer;
+        text-align: center;
+      }
+      .nav-item.active {
+        color: #1a56db;
+        font-weight: 600;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="phone-container">
+      <div class="page-header">
+        <span class="page-title">Lịch sử giao dịch</span>
+      </div>
+
+      <div class="content">
+        <h3 class="sec-title">Giao dịch đang xử lý</h3>
+        <div class="tx-box" id="txPendingBox">
+          <div class="empty-tx">Không có giao dịch nào đang xử lý</div>
+        </div>
+
+        <h3 class="sec-title">Giao dịch thành công</h3>
+        <div class="tx-box" id="txSuccessBox">
+          <div class="empty-tx">Không có giao dịch thành công nào</div>
+        </div>
+      </div>
+
+      <div class="bottom-nav">
+        <div
+          class="nav-item"
+          id="btnNavHome"
+          onclick="window.location.href = 'trangchu.html'"
+        >
+          <div>🌍</div>
+          Trang chủ
+        </div>
+        <div class="nav-item active" id="btnNavHistory">
+          <div>⌛</div>
+          Lịch sử
+        </div>
+        <div
+          class="nav-item"
+          id="btnLogout"
+          style="color: #dc2626; font-weight: bold"
+        >
+          <div>🚪</div>
+          Thoát
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const API_BASE_URL = "https://quintet-rickety-scuba.ngrok-free.dev";
+      async function loadHistoryData() {
+        try {
+          const res = await fetch(`${API_BASE_URL}/profile`, {
+            method: "GET",
+            credentials: "include",
+          });
+          if (!res.ok) {
+            window.location.href = "login.html";
+            return;
+          }
+          const data = await res.json();
+
+          // Xử lý Giao dịch đang xử lý
+          const txPendingBox = document.getElementById("txPendingBox");
+          if (
+            data.user_transaction_DangXuLy &&
+            data.user_transaction_DangXuLy.length > 0
+          ) {
+            txPendingBox.innerHTML = "";
+            data.user_transaction_DangXuLy.forEach((tx) => {
+              const div = document.createElement("div");
+              div.className = "tx-item";
+              div.innerHTML = `
+                <div>
+                  <div class="tx-title">${tx["Nop/Rut"]} tích lũy</div>
+                  <div class="tx-date">${tx.created_at}</div>
+                </div>
+                <div style="text-align:right">
+                    <div style="font-weight:700; color:#f59e0b;">${tx["Nop/Rut"] === "Nộp" ? "+" : "-"}${tx.tien}</div>
+                    <span class="status status-pending">${tx.TrangThaiGiaoDich}</span>
+                </div>`;
+              txPendingBox.appendChild(div);
+            });
+          }
+
+          // Xử lý Giao dịch thành công
+          const txSuccessBox = document.getElementById("txSuccessBox");
+          if (
+            data.user_transaction_success &&
+            data.user_transaction_success.length > 0
+          ) {
+            txSuccessBox.innerHTML = "";
+            data.user_transaction_success.forEach((tx) => {
+              const isHuy = tx.TrangThaiGiaoDich === "Đã hủy";
+              const div = document.createElement("div");
+              div.className = "tx-item";
+              div.innerHTML = `
+                <div>
+                  <div class="tx-title">${tx["Nop/Rut"]} tích lũy</div>
+                  <div class="tx-date">${tx.created_at}</div>
+                </div>
+                <div style="text-align:right">
+                    <div style="font-weight:700; ${isHuy ? "text-decoration:line-through;color:#94a3b8;" : "color:#10b981;"}">${tx["Nop/Rut"] === "Nộp" ? "+" : "-"}${tx.tien}</div>
+                    <span class="status ${isHuy ? "status-cancel" : ""}">${tx.TrangThaiGiaoDich}</span>
+                </div>`;
+              txSuccessBox.appendChild(div);
+            });
+          }
+        } catch (err) {
+          console.error(err);
+          window.location.href = "login.html";
+        }
+      }
+
+      document
+        .getElementById("btnLogout")
+        .addEventListener("click", async () => {
+          await fetch(`${API_BASE_URL}/logout`, {
+            method: "POST",
+            credentials: "include",
+          });
+          window.location.href = "login.html";
+        });
+
+      document.addEventListener("DOMContentLoaded", loadHistoryData);
+    </script>
+  </body>
+</html>

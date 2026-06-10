@@ -1,0 +1,187 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Thông tin đầu tư</title>
+    <style>
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+        font-family:
+          -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      }
+      body {
+        background-color: #f4f6f9;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+      }
+      .phone-container {
+        width: 100%;
+        max-width: 412px;
+        height: 100vh;
+        max-height: 892px;
+        background-color: #ffffff;
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+        display: flex;
+        flex-direction: column;
+        overflow-y: auto;
+        border-radius: 24px;
+      }
+      @media (max-width: 450px) {
+        .phone-container {
+          border-radius: 0;
+          max-height: 100vh;
+        }
+      }
+
+      /* Thanh header điều hướng quay lại */
+      .back-header {
+        display: flex;
+        align-items: center;
+        padding: 20px 16px 10px 16px;
+        background-color: #ffffff;
+        border-bottom: 1px solid #f1f5f9;
+      }
+      .back-btn {
+        font-size: 24px;
+        font-weight: bold;
+        color: #1a56db;
+        cursor: pointer;
+        padding-right: 12px;
+        display: inline-block;
+      }
+      .page-title {
+        font-size: 18px;
+        font-weight: 700;
+        color: #1e293b;
+      }
+
+      .content {
+        padding: 16px;
+        flex: 1;
+      }
+      .invest-box {
+        background-color: #f8fafc;
+        border-radius: 16px;
+        border: 1px solid #e2e8f0;
+        padding: 16px;
+        margin-top: 8px;
+      }
+      .row {
+        display: flex;
+        justify-content: space-between;
+        padding: 14px 0;
+        border-bottom: 1px solid #f1f5f9;
+      }
+      .row:last-child {
+        border-bottom: none;
+      }
+      .row-lbl {
+        font-size: 14px;
+        font-weight: 600;
+        color: #475569;
+      }
+      .row-val {
+        font-size: 14px;
+        font-weight: 700;
+        color: #1e293b;
+        text-align: right;
+      }
+      .positive {
+        color: #10b981;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="phone-container">
+      <div class="back-header">
+        <span class="back-btn" onclick="window.location.href = 'trangchu.html'"
+          >&larr;</span
+        >
+        <span class="page-title">Chi tiết đầu tư</span>
+      </div>
+
+      <div class="content">
+        <div class="invest-box">
+          <div class="row">
+            <div>
+              <div class="row-lbl">Tổng giá trị</div>
+              <div style="font-size: 12px; color: #64748b" id="lblSubVon">
+                Vốn: đang tải...
+              </div>
+            </div>
+            <div class="row-val" id="lblInvestVal">đang tải...</div>
+          </div>
+          <div class="row">
+            <div>
+              <div class="row-lbl">Lợi nhuận</div>
+              <div style="font-size: 12px; color: #64748b">
+                Hiệu suất danh mục
+              </div>
+            </div>
+            <div>
+              <div class="row-val positive" id="lblProfit">+0 VND</div>
+              <div
+                class="row-val positive"
+                style="font-size: 12px"
+                id="lblRate"
+              >
+                (0%)
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div>
+              <div class="row-lbl">Chứng chỉ quỹ sở hữu</div>
+              <div style="font-size: 12px; color: #64748b" id="lblNavPrice">
+                Giá CCQ: đang tải...
+              </div>
+            </div>
+            <div class="row-val" id="lblCcqCount">0.00</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const API_BASE_URL = "https://quintet-rickety-scuba.ngrok-free.dev";
+      async function loadInvestmentData() {
+        try {
+          const res = await fetch(`${API_BASE_URL}/profile`, {
+            method: "GET",
+            credentials: "include",
+          });
+          if (!res.ok) {
+            window.location.href = "login.html";
+            return;
+          }
+          const data = await res.json();
+          const info = data.user_information;
+
+          // Cập nhật các thông tin dữ liệu API lên trang mới
+          document.getElementById("lblInvestVal").innerText =
+            info["Giá trị tài sản ròng"];
+          document.getElementById("lblSubVon").innerText =
+            "Vốn: " + info["Tổng vốn"];
+          document.getElementById("lblProfit").innerText =
+            "+" + info["Biên độ lãi"];
+          document.getElementById("lblRate").innerText =
+            "(" + info["Hiệu suất"] + ")";
+          document.getElementById("lblCcqCount").innerText =
+            info["Chứng chỉ quỹ nắm giữ (CCQ)"];
+          document.getElementById("lblNavPrice").innerText =
+            "Giá CCQ: " + data.GiaCCQ;
+        } catch (err) {
+          console.error(err);
+          window.location.href = "login.html";
+        }
+      }
+
+      document.addEventListener("DOMContentLoaded", loadInvestmentData);
+    </script>
+  </body>
+</html>

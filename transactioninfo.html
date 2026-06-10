@@ -1,0 +1,339 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Thông tin giao dịch</title>
+    <style>
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+        font-family:
+          -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      }
+      body {
+        background-color: #f4f6f9;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+      }
+      .phone-container {
+        width: 100%;
+        max-width: 412px;
+        height: 100vh;
+        max-height: 892px;
+        background-color: #ffffff;
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+        display: flex;
+        flex-direction: column;
+        overflow-y: auto;
+        border-radius: 24px;
+      }
+      @media (max-width: 450px) {
+        .phone-container {
+          border-radius: 0;
+          max-height: 100vh;
+        }
+      }
+      .header {
+        padding: 20px;
+        text-align: center;
+        border-bottom: 1px solid #e2e8f0;
+      }
+      .header-title {
+        font-size: 18px;
+        font-weight: 700;
+        color: #1a202c;
+      }
+      .content {
+        padding: 24px 20px;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+      .success-icon {
+        width: 60px;
+        height: 60px;
+        background-color: #ecfdf5;
+        color: #10b981;
+        border-radius: 50%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 32px;
+        margin-bottom: 12px;
+      }
+      .status-text {
+        font-size: 16px;
+        color: #10b981;
+        font-weight: 700;
+        margin-bottom: 20px;
+      }
+
+      /* Khu vực hiển thị mã QR */
+      .qr-container {
+        display: none; /* Mặc định ẩn, chỉ hiện khi Nộp tiền */
+        flex-direction: column;
+        align-items: center;
+        background: #ffffff;
+        padding: 16px;
+        border-radius: 16px;
+        border: 1px dashed #cbd5e1;
+        margin-bottom: 20px;
+        width: 100%;
+        max-width: 260px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+      }
+      .qr-image {
+        width: 200px;
+        height: 200px;
+        object-fit: contain;
+        margin-bottom: 12px;
+      }
+      .btn-download-qr {
+        background-color: #f1f5f9;
+        color: #334155;
+        border: 1px solid #cbd5e1;
+        padding: 8px 16px;
+        border-radius: 8px;
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        transition: all 0.2s;
+      }
+      .btn-download-qr:hover {
+        background-color: #e2e8f0;
+      }
+
+      .info-card {
+        width: 100%;
+        background-color: #f8fafc;
+        border-radius: 16px;
+        padding: 20px;
+        border: 1px solid #e2e8f0;
+        margin-bottom: 24px;
+      }
+      .info-row {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 14px;
+        font-size: 14px;
+        align-items: flex-start;
+      }
+      .info-row:last-child {
+        margin-bottom: 0;
+      }
+      .info-label {
+        color: #64748b;
+        flex: 1;
+      }
+      .info-value {
+        font-weight: 600;
+        color: #1e293b;
+        text-align: right;
+        flex: 1.5;
+        word-break: break-all;
+      }
+      .highlight-amount {
+        color: #2563eb;
+        font-size: 18px;
+        font-weight: 800;
+      }
+      .btn-group {
+        width: 100%;
+        margin-top: auto;
+      }
+      .btn-home {
+        width: 100%;
+        padding: 14px;
+        background-color: #2563eb;
+        color: white;
+        border: none;
+        border-radius: 12px;
+        font-size: 16px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: background-color 0.2s;
+        text-align: center;
+        display: block;
+        text-decoration: none;
+      }
+      .btn-home:hover {
+        background-color: #1d4ed8;
+      }
+      .notice-box {
+        font-size: 12px;
+        color: #64748b;
+        text-align: center;
+        margin-top: 5px;
+        line-height: 1.5;
+        background-color: #fffbeb;
+        border: 1px solid #fde68a;
+        padding: 12px;
+        border-radius: 12px;
+        width: 100%;
+        margin-bottom: 20px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="phone-container">
+      <div class="header">
+        <div class="header-title">Kết quả giao dịch</div>
+      </div>
+
+      <div class="content">
+        <div class="success-icon">✓</div>
+        <div class="status-text">Giao dịch đã được ghi nhận</div>
+
+        <div class="qr-container" id="qrBlock">
+          <img src="" alt="Mã QR Chuyển khoản" class="qr-image" id="imgQR" />
+          <button type="button" class="btn-download-qr" id="btnDownloadQR">
+            📥 Tải mã QR về máy
+          </button>
+        </div>
+
+        <div class="notice-box" id="lblNotice">Đang tải thông báo...</div>
+
+        <div class="info-card">
+          <div class="info-row">
+            <span class="info-label">Tài khoản (Email):</span>
+            <span class="info-value" id="lblEmail">-</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Loại giao dịch:</span>
+            <span class="info-value" id="lblAction" style="font-weight: 700"
+              >-</span
+            >
+          </div>
+          <div class="info-row">
+            <span class="info-label">Số lượng CCQ:</span>
+            <span class="info-value" id="lblCCQ" style="color: #ed8936"
+              >0.00 CCQ</span
+            >
+          </div>
+          <div class="info-row">
+            <span class="info-label">Ngân hàng:</span>
+            <span class="info-value" id="lblBank">-</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Số tài khoản:</span>
+            <span
+              class="info-value"
+              id="lblAccount"
+              style="letter-spacing: 0.5px"
+              >-</span
+            >
+          </div>
+          <div
+            class="info-row"
+            style="
+              border-top: 1px dashed #cbd5e1;
+              padding-top: 14px;
+              margin-top: 14px;
+            "
+          >
+            <span class="info-label" style="font-weight: 700; color: #1e293b"
+              >Số tiền:</span
+            >
+            <span class="info-value highlight-amount" id="lblAmount"
+              >0 VND</span
+            >
+          </div>
+          <div class="info-row">
+            <span class="info-label">Nội dung chuyển khoản:</span>
+            <span
+              class="info-value"
+              id="lblContent"
+              style="color: #dc2626; font-family: monospace; font-size: 15px"
+              >-</span
+            >
+          </div>
+        </div>
+
+        <div class="btn-group">
+          <a href="trangchu.html" class="btn-home">Về Trang Chủ</a>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      let globalQRUrl = "";
+
+      function parseTransactionInfo() {
+        const urlParams = new URLSearchParams(window.location.search);
+
+        const email = urlParams.get("email") || "Không rõ";
+        const action = urlParams.get("action") || "Giao dịch CCQ";
+        const bank = urlParams.get("bank") || "";
+        const account = urlParams.get("account") || "";
+        const amountRaw = parseInt(urlParams.get("amount")) || 0;
+        const content = urlParams.get("content") || "";
+        const ccqRaw = parseFloat(urlParams.get("ccq")) || 0;
+
+        // Điền thông tin văn bản cơ bản
+        document.getElementById("lblEmail").innerText = email;
+        document.getElementById("lblAction").innerText = action;
+        document.getElementById("lblCCQ").innerText =
+          ccqRaw.toFixed(2) + " CCQ";
+        document.getElementById("lblBank").innerText = bank.toUpperCase();
+        document.getElementById("lblAccount").innerText = account;
+        document.getElementById("lblAmount").innerText =
+          amountRaw.toLocaleString("en-US") + " VND";
+        document.getElementById("lblContent").innerText = content;
+
+        const noticeElement = document.getElementById("lblNotice");
+        const qrBlock = document.getElementById("qrBlock");
+
+        // Kiểm tra xem là lệnh Nộp hay Rút
+        if (action.includes("Nộp")) {
+          // Hiển thị khối chứa QR
+          qrBlock.style.display = "flex";
+
+          // Khởi tạo link QR động SePay đúng định dạng cấu trúc hệ thống của bạn
+          globalQRUrl = `https://qr.sepay.vn/img?bank=${bank}&acc=${account}&template=qronly&amount=${amountRaw}&des=${encodeURIComponent(content)}`;
+          document.getElementById("imgQR").src = globalQRUrl;
+
+          // Cập nhật hướng dẫn nộp tiền chi tiết
+          noticeElement.innerHTML = `<strong>Hướng dẫn nộp tiền:</strong> Quét mã QR phía trên hoặc chuyển khoản thủ công đúng <strong>${amountRaw.toLocaleString("en-US")} VND</strong> vào tài khoản <strong>${account}</strong> (${bank.toUpperCase()}) kèm nội dung <strong>${content}</strong>.`;
+        } else {
+          // Lệnh Rút tiền -> Ẩn khối QR
+          qrBlock.style.display = "none";
+          noticeElement.innerHTML = `<strong>Thông báo rút tiền:</strong> Lệnh bán <strong>${ccqRaw.toFixed(2)} CCQ</strong> đang chờ xử lý. Hệ thống sẽ thanh toán tiền về số tài khoản ngân hàng của bạn trong vòng 24h làm việc.`;
+        }
+      }
+
+      // Xử lý cơ chế tải hình ảnh mã QR về bộ nhớ máy Client
+      document
+        .getElementById("btnDownloadQR")
+        .addEventListener("click", async function () {
+          if (!globalQRUrl) return;
+          try {
+            // Bắt buộc fetch ảnh về dạng Blob để tránh cơ chế bảo mật của trình duyệt mở tab mới thay vì tải xuống
+            const response = await fetch(globalQRUrl);
+            const blob = await response.blob();
+
+            const downloadLink = document.createElement("a");
+            downloadLink.href = URL.createObjectURL(blob);
+            downloadLink.download = "Ma_QR_Chuyen_Khoan.png"; // Tên tệp khi tải về máy
+
+            document.body.appendChild(downloadLink);
+            downloadLink.click();
+            document.body.removeChild(downloadLink);
+          } catch (error) {
+            console.error("Không thể tải mã QR trực tiếp:", error);
+            // Cơ chế dự phòng nếu gặp lỗi CORS: Mở ảnh trong một Tab mới để người dùng tự lưu (nhấn giữ / chuột phải)
+            window.open(globalQRUrl, "_blank");
+          }
+        });
+
+      document.addEventListener("DOMContentLoaded", parseTransactionInfo);
+    </script>
+  </body>
+</html>
