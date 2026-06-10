@@ -316,13 +316,14 @@
     </div>
 
     <script>
-      const API_BASE_URL = "http://127.0.0.1:5001";
+      const API_BASE_URL = "https://quintet-rickety-scuba.ngrok-free.dev";
 
       async function loadProfile() {
         try {
           const res = await fetch(`${API_BASE_URL}/profile`, {
             method: "GET",
             credentials: "include",
+            headers: { "ngrok-skip-browser-warning": "69420" },
           });
           if (!res.ok) {
             window.location.href = "login.html";
