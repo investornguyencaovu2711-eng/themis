@@ -2,113 +2,146 @@
 <html lang="vi">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0, viewport-fit=cover"
+    />
     <title>Giao dịch CCQ</title>
     <style>
-      * {
+      *,
+      *::before,
+      *::after {
         box-sizing: border-box;
         margin: 0;
         padding: 0;
+        -webkit-tap-highlight-color: transparent;
         font-family:
           -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       }
+
+      html {
+        -webkit-text-size-adjust: 100%;
+        text-size-adjust: 100%;
+      }
+
       body {
         background-color: #f4f6f9;
         display: flex;
         justify-content: center;
         align-items: center;
         min-height: 100vh;
+        min-height: 100dvh;
+        overscroll-behavior: none;
       }
+
       .phone-container {
         width: 100%;
         max-width: 412px;
         height: 100vh;
+        height: 100dvh;
         max-height: 892px;
         background-color: #ffffff;
         box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
         display: flex;
         flex-direction: column;
         overflow-y: auto;
+        overflow-x: hidden;
         border-radius: 24px;
+        position: relative;
+        -webkit-overflow-scrolling: touch;
+        overscroll-behavior-y: contain;
       }
+
       @media (max-width: 450px) {
         .phone-container {
           border-radius: 0;
-          max-height: 100vh;
+          max-height: 100dvh;
+          padding-top: env(safe-area-inset-top);
+          padding-bottom: env(safe-area-inset-bottom);
         }
       }
+
+      .phone-container::-webkit-scrollbar {
+        width: 0px;
+        background: transparent;
+      }
+
       .header {
-        padding: 20px;
+        padding: 24px 20px 16px 20px;
         display: flex;
         align-items: center;
-        border-bottom: 1px solid #e2e8f0;
+        border-bottom: 1px solid #f1f5f9;
+        background-color: #ffffff;
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        flex-shrink: 0;
+        -webkit-user-select: none;
+        user-select: none;
       }
       .back-btn {
-        font-size: 20px;
+        font-size: 22px;
         cursor: pointer;
         margin-right: 15px;
         text-decoration: none;
         color: #1a202c;
+        padding: 4px;
+        border-radius: 8px;
+        transition: background-color 0.15s;
+      }
+      .back-btn:active {
+        background-color: #f1f5f9;
       }
       .header-title {
         font-size: 18px;
         font-weight: 700;
-        color: #1a202c;
+        color: #0f172a;
       }
+
       .content {
         padding: 20px;
         flex: 1;
-      }
-      .info-box {
-        background-color: #f8fafc;
-        border-radius: 12px;
-        padding: 15px;
-        margin-bottom: 20px;
-        border: 1px solid #e2e8f0;
-        font-size: 14px;
-      }
-      .info-row {
         display: flex;
-        justify-content: space-between;
-        margin-bottom: 8px;
+        flex-direction: column;
       }
-      .info-row:last-child {
-        margin-bottom: 0;
-      }
-      .info-label {
-        color: #64748b;
-      }
-      .info-value {
-        font-weight: 600;
-        color: #1e293b;
-      }
+
       .form-group {
         margin-bottom: 20px;
       }
       label {
         display: block;
-        font-size: 14px;
+        font-size: 13px;
         font-weight: 600;
-        color: #475569;
+        color: #64748b;
         margin-bottom: 8px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        -webkit-user-select: none;
+        user-select: none;
       }
       .input-wrapper {
         position: relative;
         display: flex;
         align-items: center;
       }
+
       input {
         width: 100%;
-        padding: 12px 16px;
+        padding: 14px 16px;
         border: 1px solid #cbd5e1;
-        border-radius: 10px;
-        font-size: 16px;
+        border-radius: 12px;
+        font-size: 16px !important;
         font-weight: 600;
         outline: none;
-        transition: border-color 0.2s;
+        background-color: #ffffff;
+        transition: all 0.2s ease;
+        appearance: none;
+        -webkit-user-select: text;
+        user-select: text;
       }
       input:focus {
         border-color: #2563eb;
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
       }
       .input-unit {
         position: absolute;
@@ -116,44 +149,94 @@
         font-size: 14px;
         font-weight: bold;
         color: #94a3b8;
+        pointer-events: none;
+        -webkit-user-select: none;
+        user-select: none;
       }
-      .hint-text {
-        font-size: 12px;
-        color: #64748b;
-        margin-top: 6px;
-      }
+
+      button,
       .btn-submit {
         width: 100%;
+        min-height: 52px;
         padding: 14px;
         border: none;
-        border-radius: 12px;
+        border-radius: 14px;
         font-size: 16px;
         font-weight: 700;
         color: white;
         cursor: pointer;
-        transition: background-color 0.2s;
+        transition:
+          opacity 0.15s ease,
+          transform 0.1s;
+        display: flex;
+        justify-content: center;
+        align-items: center;
         margin-top: 10px;
+        -webkit-user-select: none;
+        user-select: none;
+      }
+      button:active {
+        transform: scale(0.98);
+        opacity: 0.8;
       }
       .btn-nap {
-        background-color: #22c55e;
-      }
-      .btn-nap:hover {
-        background-color: #16a34a;
+        background-color: #10b981;
       }
       .btn-rut {
-        background-color: #dc2626;
+        background-color: #ef4444;
       }
-      .btn-rut:hover {
-        background-color: #b91c1c;
+      button:disabled {
+        opacity: 0.7;
+        pointer-events: none;
+      }
+
+      .info-box {
+        background-color: #f8fafc;
+        border-radius: 16px;
+        padding: 16px;
+        margin-bottom: 24px;
+        border: 1px solid #e2e8f0;
+      }
+      .info-row {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 12px;
+        font-size: 14px;
+        align-items: center;
+      }
+      .info-row:last-child {
+        margin-bottom: 0;
+      }
+      .info-label {
+        color: #64748b;
+        flex: 1;
+        -webkit-user-select: none;
+        user-select: none;
+      }
+      .info-value {
+        font-weight: 600;
+        color: #0f172a;
+        text-align: right;
+        flex: 1.5;
+        word-break: break-word;
+      }
+
+      .hint-text {
+        font-size: 13px;
+        color: #64748b;
+        margin-top: 8px;
+        line-height: 1.4;
+        -webkit-user-select: none;
+        user-select: none;
       }
 
       input[type="number"]::-webkit-inner-spin-button,
       input[type="number"]::-webkit-outer-spin-button {
-        -webkit-appearance: opacity !important;
-        opacity: 1 !important;
-        position: relative;
-        right: 50px; /* Tránh đè lên chữ CCQ ở góc phải */
-        cursor: pointer;
+        -webkit-appearance: none;
+        margin: 0;
+      }
+      input[type="number"] {
+        -moz-appearance: textfield;
       }
     </style>
   </head>
@@ -221,9 +304,8 @@
       let giaCCQ = 0;
       let ccqNamGiu = 0;
       let actionType = "nap";
-      let thucTeSoTien = 0; // Biến phụ để lưu giá trị số nguyên nguyên bản phục vụ đẩy lên API
+      let thucTeSoTien = 0;
 
-      // 1. Phân tích tham số từ URL (?action=nap hoặc ?action=rut)
       function initActionType() {
         const urlParams = new URLSearchParams(window.location.search);
         const action = urlParams.get("action");
@@ -236,8 +318,6 @@
             "Số lượng CCQ muốn BÁN";
           document.getElementById("btnAction").innerText = "Xác nhận RÚT TIỀN";
           document.getElementById("btnAction").classList.add("btn-rut");
-
-          // Cập nhật lại dòng ghi chú công thức cho lệnh Bán
           document.querySelector(".hint-text").innerText =
             "Bán CCQ sẽ mất phí 3%";
         } else {
@@ -252,7 +332,6 @@
         }
       }
 
-      // 2. Tải thông tin tài sản và Giá CCQ từ API Profile
       async function loadProfileData() {
         try {
           const res = await fetch(`${API_BASE_URL}/profile`, {
@@ -267,7 +346,6 @@
           const data = await res.json();
 
           giaCCQ = parseFloat(data.GiaCCQ);
-          // Định dạng hiển thị giá quỹ phân tách dấu phẩy hàng nghìn
           document.getElementById("lblGiaCCQ").innerText =
             giaCCQ.toLocaleString("en-US") + " VND / CCQ";
 
@@ -287,15 +365,11 @@
         }
       }
 
-      // 3. Lắng nghe hành vi nhập liệu CCQ (Xử lý đồng thời giới hạn thập phân & Định dạng tiền tệ)
       document.getElementById("txtCCQ").addEventListener("input", function () {
         let valueStr = this.value;
-
-        // Cơ chế 1: Kiểm tra và cắt chuỗi nếu người dùng cố ý nhập quá 2 chữ số thập phân
         if (valueStr.includes(".")) {
           const parts = valueStr.split(".");
           if (parts[1].length > 2) {
-            // Chỉ lấy phần nguyên và đúng 2 chữ số thập phân đầu tiên, loại bỏ số thứ 3 trở đi
             valueStr = parts[0] + "." + parts[1].slice(0, 2);
             this.value = valueStr;
           }
@@ -303,21 +377,15 @@
 
         const ccqInput = parseFloat(valueStr) || 0;
 
-        // Cơ chế 2: Tính toán tiền quy đổi dựa theo loại giao dịch
         if (actionType === "rut") {
-          // Lệnh bán: Số tiền = Giá CCQ * Số CCQ * 97%
           thucTeSoTien = Math.round(ccqInput * giaCCQ * 0.97);
         } else {
-          // Lệnh nạp: Số tiền = Giá CCQ * Số CCQ
           thucTeSoTien = Math.round(ccqInput * giaCCQ);
         }
-
-        // Định dạng phân tách hàng nghìn (VD: 1,000,000) hiển thị lên giao diện
         document.getElementById("txtTien").value =
           thucTeSoTien.toLocaleString("en-US");
       });
 
-      // 4. Xử lý sự kiện Submit Form gửi dữ liệu sang API /create-transaction
       document
         .getElementById("transactionForm")
         .addEventListener("submit", async function (e) {
@@ -338,7 +406,6 @@
             return;
           }
 
-          // Tạo mã nội dung chuyển khoản cố định để đồng bộ giữa API và trang biên lai
           const maNoiDung =
             Math.floor(100000 + Math.random() * 900000) + String(Date.now());
 
@@ -358,7 +425,6 @@
             const resultText = await res.text();
 
             if (res.status === 200) {
-              // Tải lại thông tin tài khoản đang đăng nhập để truyền sang trang hóa đơn
               const profileRes = await fetch(`${API_BASE_URL}/profile`, {
                 method: "GET",
                 credentials: "include",
@@ -367,23 +433,19 @@
               const profileData = await profileRes.json();
               const userEmail = profileData.user_information.Email || "";
 
-              // Xác định Ngân hàng và Số tài khoản hiển thị theo logic nộp / rút của bạn
               let nganHangHienThi = "";
               let soTaiKhoanHienThi = "";
 
               if (actionType === "rut") {
-                // Lệnh RÚT: Lấy từ thông tin cấu hình cá nhân trong user_information
                 nganHangHienThi =
                   profileData.user_information["Ngân hàng"] || "TPBank";
                 soTaiKhoanHienThi =
                   profileData.user_information["Số tài khoản"] || "";
               } else {
-                // Lệnh NỘP: Lấy thông tin tài khoản thụ hưởng cố định của hệ thống / quỹ
                 nganHangHienThi = "TPBank";
                 soTaiKhoanHienThi = "00002716749";
               }
 
-              // Đóng gói toàn bộ thông tin đẩy qua trang mới qua URL parameters
               const params = new URLSearchParams({
                 email: userEmail,
                 action:
@@ -397,7 +459,6 @@
                 ccq: ccqValue,
               });
 
-              // Nhảy sang trang thông tin giao dịch mới
               window.location.href =
                 "transactioninfo.html?" + params.toString();
             } else {

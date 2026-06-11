@@ -2,51 +2,90 @@
 <html lang="vi">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0, viewport-fit=cover"
+    />
     <title>Thông tin giao dịch</title>
     <style>
-      * {
+      *,
+      *::before,
+      *::after {
         box-sizing: border-box;
         margin: 0;
         padding: 0;
+        -webkit-tap-highlight-color: transparent;
         font-family:
           -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       }
+
+      html {
+        -webkit-text-size-adjust: 100%;
+        text-size-adjust: 100%;
+      }
+
       body {
         background-color: #f4f6f9;
         display: flex;
         justify-content: center;
         align-items: center;
         min-height: 100vh;
+        min-height: 100dvh;
+        overscroll-behavior: none;
       }
+
       .phone-container {
         width: 100%;
         max-width: 412px;
         height: 100vh;
+        height: 100dvh;
         max-height: 892px;
         background-color: #ffffff;
         box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
         display: flex;
         flex-direction: column;
         overflow-y: auto;
+        overflow-x: hidden;
         border-radius: 24px;
+        position: relative;
+        -webkit-overflow-scrolling: touch;
+        overscroll-behavior-y: contain;
       }
+
       @media (max-width: 450px) {
         .phone-container {
           border-radius: 0;
-          max-height: 100vh;
+          max-height: 100dvh;
+          padding-top: env(safe-area-inset-top);
+          padding-bottom: env(safe-area-inset-bottom);
         }
       }
+
+      .phone-container::-webkit-scrollbar {
+        width: 0px;
+        background: transparent;
+      }
+
       .header {
-        padding: 20px;
-        text-align: center;
-        border-bottom: 1px solid #e2e8f0;
+        padding: 24px 20px 16px 20px;
+        display: flex;
+        align-items: center;
+        border-bottom: 1px solid #f1f5f9;
+        background-color: #ffffff;
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        justify-content: center;
+        -webkit-user-select: none;
+        user-select: none;
+        flex-shrink: 0;
       }
       .header-title {
         font-size: 18px;
         font-weight: 700;
-        color: #1a202c;
+        color: #0f172a;
       }
+
       .content {
         padding: 24px 20px;
         flex: 1;
@@ -54,61 +93,84 @@
         flex-direction: column;
         align-items: center;
       }
+
       .success-icon {
-        width: 60px;
-        height: 60px;
-        background-color: #ecfdf5;
-        color: #10b981;
+        width: 64px;
+        height: 64px;
+        background-color: #d1fae5;
+        color: #059669;
         border-radius: 50%;
         display: flex;
         justify-content: center;
         align-items: center;
         font-size: 32px;
-        margin-bottom: 12px;
+        margin: 0 auto 16px auto;
+        -webkit-user-select: none;
+        user-select: none;
       }
       .status-text {
-        font-size: 16px;
-        color: #10b981;
+        font-size: 18px;
+        color: #059669;
         font-weight: 700;
-        margin-bottom: 20px;
+        margin-bottom: 24px;
+        text-align: center;
+        -webkit-user-select: none;
+        user-select: none;
       }
 
-      /* Khu vực hiển thị mã QR */
       .qr-container {
-        display: none; /* Mặc định ẩn, chỉ hiện khi Nộp tiền */
+        display: none;
         flex-direction: column;
         align-items: center;
         background: #ffffff;
-        padding: 16px;
-        border-radius: 16px;
-        border: 1px dashed #cbd5e1;
-        margin-bottom: 20px;
+        padding: 20px;
+        border-radius: 20px;
+        border: 2px dashed #cbd5e1;
+        margin-bottom: 24px;
         width: 100%;
-        max-width: 260px;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
       }
       .qr-image {
-        width: 200px;
-        height: 200px;
+        width: 220px;
+        height: 220px;
         object-fit: contain;
-        margin-bottom: 12px;
+        margin-bottom: 16px;
+        border-radius: 8px;
       }
+
       .btn-download-qr {
         background-color: #f1f5f9;
         color: #334155;
         border: 1px solid #cbd5e1;
-        padding: 8px 16px;
-        border-radius: 8px;
-        font-size: 13px;
+        padding: 10px 20px;
+        border-radius: 10px;
+        font-size: 14px;
         font-weight: 600;
+        min-height: 44px;
         cursor: pointer;
         display: flex;
         align-items: center;
         gap: 6px;
-        transition: all 0.2s;
+        -webkit-user-select: none;
+        user-select: none;
+        transition: background-color 0.15s;
       }
-      .btn-download-qr:hover {
+      .btn-download-qr:active {
         background-color: #e2e8f0;
+      }
+
+      .notice-box {
+        font-size: 13px;
+        color: #b45309;
+        line-height: 1.5;
+        background-color: #fef3c7;
+        border: 1px solid #fde68a;
+        padding: 14px;
+        border-radius: 12px;
+        width: 100%;
+        margin-bottom: 24px;
+        text-align: center;
+        -webkit-user-select: text;
+        user-select: text;
       }
 
       .info-card {
@@ -132,59 +194,59 @@
       .info-label {
         color: #64748b;
         flex: 1;
+        -webkit-user-select: none;
+        user-select: none;
       }
-      .info-value {
+      .info-value,
+      .highlight-amount {
         font-weight: 600;
         color: #1e293b;
         text-align: right;
         flex: 1.5;
-        word-break: break-all;
+        word-break: break-word;
+        -webkit-user-select: text;
+        user-select: text; /* Cho phép copy tài khoản/số tiền */
       }
       .highlight-amount {
         color: #2563eb;
         font-size: 18px;
         font-weight: 800;
       }
+
       .btn-group {
         width: 100%;
         margin-top: auto;
+        padding-bottom: 20px;
       }
       .btn-home {
         width: 100%;
+        min-height: 52px;
         padding: 14px;
         background-color: #2563eb;
         color: white;
         border: none;
-        border-radius: 12px;
+        border-radius: 14px;
         font-size: 16px;
         font-weight: 700;
         cursor: pointer;
-        transition: background-color 0.2s;
+        transition:
+          opacity 0.15s,
+          transform 0.1s;
         text-align: center;
         display: block;
         text-decoration: none;
+        -webkit-user-select: none;
+        user-select: none;
       }
-      .btn-home:hover {
-        background-color: #1d4ed8;
-      }
-      .notice-box {
-        font-size: 12px;
-        color: #64748b;
-        text-align: center;
-        margin-top: 5px;
-        line-height: 1.5;
-        background-color: #fffbeb;
-        border: 1px solid #fde68a;
-        padding: 12px;
-        border-radius: 12px;
-        width: 100%;
-        margin-bottom: 20px;
+      .btn-home:active {
+        transform: scale(0.98);
+        opacity: 0.8;
       }
     </style>
   </head>
   <body>
     <div class="phone-container">
-      <div class="header">
+      <div class="header center">
         <div class="header-title">Kết quả giao dịch</div>
       </div>
 
@@ -277,7 +339,6 @@
         const content = urlParams.get("content") || "";
         const ccqRaw = parseFloat(urlParams.get("ccq")) || 0;
 
-        // Điền thông tin văn bản cơ bản
         document.getElementById("lblEmail").innerText = email;
         document.getElementById("lblAction").innerText = action;
         document.getElementById("lblCCQ").innerText =
@@ -291,44 +352,34 @@
         const noticeElement = document.getElementById("lblNotice");
         const qrBlock = document.getElementById("qrBlock");
 
-        // Kiểm tra xem là lệnh Nộp hay Rút
         if (action.includes("Nộp")) {
-          // Hiển thị khối chứa QR
           qrBlock.style.display = "flex";
-
-          // Khởi tạo link QR động SePay đúng định dạng cấu trúc hệ thống của bạn
           globalQRUrl = `https://qr.sepay.vn/img?bank=${bank}&acc=${account}&template=qronly&amount=${amountRaw}&des=${encodeURIComponent(content)}`;
           document.getElementById("imgQR").src = globalQRUrl;
-
-          // Cập nhật hướng dẫn nộp tiền chi tiết
           noticeElement.innerHTML = `<strong>Hướng dẫn nộp tiền:</strong> Quét mã QR phía trên hoặc chuyển khoản thủ công đúng <strong>${amountRaw.toLocaleString("en-US")} VND</strong> vào tài khoản <strong>${account}</strong> (${bank.toUpperCase()}) kèm nội dung <strong>${content}</strong>.`;
         } else {
-          // Lệnh Rút tiền -> Ẩn khối QR
           qrBlock.style.display = "none";
           noticeElement.innerHTML = `<strong>Thông báo rút tiền:</strong> Lệnh bán <strong>${ccqRaw.toFixed(2)} CCQ</strong> đang chờ xử lý. Hệ thống sẽ thanh toán tiền về số tài khoản ngân hàng của bạn trong vòng 24h làm việc.`;
         }
       }
 
-      // Xử lý cơ chế tải hình ảnh mã QR về bộ nhớ máy Client
       document
         .getElementById("btnDownloadQR")
         .addEventListener("click", async function () {
           if (!globalQRUrl) return;
           try {
-            // Bắt buộc fetch ảnh về dạng Blob để tránh cơ chế bảo mật của trình duyệt mở tab mới thay vì tải xuống
             const response = await fetch(globalQRUrl);
             const blob = await response.blob();
 
             const downloadLink = document.createElement("a");
             downloadLink.href = URL.createObjectURL(blob);
-            downloadLink.download = "Ma_QR_Chuyen_Khoan.png"; // Tên tệp khi tải về máy
+            downloadLink.download = "Ma_QR_Chuyen_Khoan.png";
 
             document.body.appendChild(downloadLink);
             downloadLink.click();
             document.body.removeChild(downloadLink);
           } catch (error) {
             console.error("Không thể tải mã QR trực tiếp:", error);
-            // Cơ chế dự phòng nếu gặp lỗi CORS: Mở ảnh trong một Tab mới để người dùng tự lưu (nhấn giữ / chuột phải)
             window.open(globalQRUrl, "_blank");
           }
         });
