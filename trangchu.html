@@ -220,14 +220,15 @@
         top: 16px;
         right: 16px;
         background-color: #22c55e;
-        font-size: 10px;
+        font-size: 12px;
         font-weight: 600;
-        padding: 6px 10px; /* Slightly bigger touch area */
+        padding: 10px 10px; /* Slightly bigger touch area */
         border-radius: 20px;
         cursor: pointer;
         -webkit-user-select: none;
         user-select: none;
         transition: opacity 0.15s ease;
+        z-index: 10;
       }
 
       .tag-profit:active {
@@ -377,12 +378,12 @@
 
       <div class="content">
         <div class="card">
-          <div
+          <a
             class="tag-profit"
             onclick="window.location.href = 'investment.html'"
           >
             Chi tiết
-          </div>
+          </a>
           <div style="font-size: 12px; opacity: 0.85; margin-top: 12px">
             Giá trị tài sản ròng
           </div>
