@@ -32,7 +32,7 @@
         align-items: center;
         min-height: 100vh;
         min-height: 100dvh; /* Dynamic viewport height for mobile */
-        overscroll-behavior: none;
+        overscroll-behavior: auto;
       }
 
       .phone-container {
@@ -51,7 +51,7 @@
         position: relative;
         /* Smooth momentum scrolling on iOS */
         -webkit-overflow-scrolling: touch;
-        overscroll-behavior-y: contain;
+        /*overscroll-behavior-y: contain;*/
       }
 
       @media (max-width: 450px) {
