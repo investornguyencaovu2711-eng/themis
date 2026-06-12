@@ -462,6 +462,9 @@
             headers: { "ngrok-skip-browser-warning": "69420" },
           });
           if (!res.ok) {
+            alert(
+              "Bạn chưa được xét duyệt hoặc lỗi đăng nhập, hãy quay lại sau!",
+            );
             window.location.href = "login.html";
             return;
           }

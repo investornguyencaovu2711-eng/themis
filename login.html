@@ -6,7 +6,7 @@
       name="viewport"
       content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0, viewport-fit=cover"
     />
-    <title>Đăng nhập</title>
+    <title>Đăng nhập / Đăng ký</title>
     <style>
       *,
       *::before,
@@ -25,11 +25,10 @@
       }
 
       body {
-        /* Thiết lập hình nền chìm và phủ thêm một lớp màu trắng mờ 75% */
         background:
           linear-gradient(rgba(255, 255, 255, 0.75), rgba(255, 255, 255, 0.75)),
           url("images/hinhnen.jpg") no-repeat center center fixed;
-        background-size: cover; /* Đảm bảo hình nền phủ kín màn hình */
+        background-size: cover;
         display: flex;
         justify-content: center;
         align-items: center;
@@ -44,11 +43,8 @@
         height: 100vh;
         height: 100dvh;
         max-height: 892px;
-        /* Thay vì màu trắng đặc, dùng trắng hơi trong suốt để thấy nhẹ hình nền phía sau */
         background-color: rgba(255, 255, 255, 0.92);
-        backdrop-filter: blur(
-          10px
-        ); /* Tạo hiệu ứng kính mờ cho form (iOS/Hiện đại) */
+        backdrop-filter: blur(10px);
         box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
         display: flex;
         flex-direction: column;
@@ -66,12 +62,7 @@
           max-height: 100dvh;
           padding-top: env(safe-area-inset-top);
           padding-bottom: env(safe-area-inset-bottom);
-          background-color: rgba(
-            255,
-            255,
-            255,
-            0.85
-          ); /* Tăng độ trong suốt trên mobile */
+          background-color: rgba(255, 255, 255, 0.85);
         }
       }
 
@@ -90,7 +81,7 @@
 
       .brand-logo {
         text-align: center;
-        margin-bottom: 40px;
+        margin-bottom: 20px;
       }
       .brand-logo .logo-img {
         width: 150px;
@@ -105,6 +96,7 @@
         margin-bottom: 24px;
         color: #1e293b;
         font-weight: 700;
+        text-align: center;
       }
 
       .form-group {
@@ -127,7 +119,7 @@
         padding: 14px 16px;
         border: 1px solid #cbd5e1;
         border-radius: 12px;
-        font-size: 16px !important; /* Ngăn iOS tự động zoom */
+        font-size: 16px !important;
         font-weight: 600;
         outline: none;
         background-color: #ffffff;
@@ -163,6 +155,7 @@
         -webkit-user-select: none;
         user-select: none;
         background-color: #2563eb;
+        margin-top: 10px;
       }
       button:active,
       .btn-login:active {
@@ -183,6 +176,22 @@
         background-color: #fef2f2;
         color: #991b1b;
         border: 1px solid #fecaca;
+        text-align: center;
+      }
+
+      /* CSS cho phần chuyển đổi Đăng nhập/Đăng ký */
+      .toggle-link {
+        display: block;
+        text-align: center;
+        margin-top: 20px;
+        font-size: 14px;
+        color: #2563eb;
+        font-weight: 600;
+        cursor: pointer;
+        text-decoration: none;
+      }
+      .toggle-link:hover {
+        text-decoration: underline;
       }
     </style>
   </head>
@@ -194,71 +203,195 @@
         </div>
 
         <div class="login-card">
-          <h2>Đăng nhập</h2>
-          <div id="loginAlert" class="login-alert"></div>
+          <h2 id="formTitle">Đăng nhập</h2>
+          <div id="alertBox" class="login-alert"></div>
+
           <form id="loginForm">
             <div class="form-group">
               <label>TÊN ĐĂNG NHẬP / EMAIL</label>
-              <input type="text" id="username" required value="" />
+              <input type="text" id="username" required />
             </div>
             <div class="form-group">
               <label>MẬT KHẨU</label>
-              <input type="password" id="password" required value="" />
+              <input type="password" id="password" required />
             </div>
             <button type="submit" class="btn-login" id="btnLogin">
               Đăng nhập
             </button>
+            <span class="toggle-link" id="showRegisterLink"
+              >Chưa có tài khoản? Đăng ký ngay</span
+            >
+          </form>
+
+          <form id="registerForm" style="display: none">
+            <div class="form-group">
+              <label>TÊN ĐĂNG NHẬP</label>
+              <input type="text" id="reg_username" required />
+            </div>
+            <div class="form-group">
+              <label>EMAIL</label>
+              <input type="email" id="reg_email" required />
+            </div>
+            <div class="form-group">
+              <label>HỌ VÀ TÊN</label>
+              <input type="text" id="reg_HovaTen" required />
+            </div>
+            <div class="form-group">
+              <label>SỐ ĐIỆN THOẠI</label>
+              <input type="text" id="reg_SoDienThoai" required />
+            </div>
+            <div class="form-group">
+              <label>MẬT KHẨU</label>
+              <input type="password" id="reg_password" required />
+            </div>
+            <div class="form-group">
+              <label>TÊN NGÂN HÀNG</label>
+              <input type="text" id="reg_TenNganHang" required />
+            </div>
+            <div class="form-group">
+              <label>SỐ TÀI KHOẢN</label>
+              <input type="text" id="reg_SoTaiKhoan" required />
+            </div>
+            <button type="submit" class="btn-login" id="btnRegister">
+              Đăng ký
+            </button>
+            <span class="toggle-link" id="showLoginLink"
+              >Đã có tài khoản? Đăng nhập tại đây</span
+            >
           </form>
         </div>
       </div>
     </div>
+
     <script>
       const API_BASE_URL = "https://quintet-rickety-scuba.ngrok-free.dev";
 
-      document
-        .getElementById("loginForm")
-        .addEventListener("submit", async (e) => {
-          e.preventDefault();
+      // --- DOM Elements ---
+      const loginForm = document.getElementById("loginForm");
+      const registerForm = document.getElementById("registerForm");
+      const formTitle = document.getElementById("formTitle");
+      const alertBox = document.getElementById("alertBox");
 
-          const alertBox = document.getElementById("loginAlert");
-          const btn = document.getElementById("btnLogin");
+      const showRegisterLink = document.getElementById("showRegisterLink");
+      const showLoginLink = document.getElementById("showLoginLink");
 
-          alertBox.style.display = "none";
-          alertBox.innerText = "";
-          btn.disabled = true;
-          btn.innerText = "Đang xác thực...";
+      // --- Hàm Tiện Ích Thông Báo ---
+      function showAlert(message, isSuccess = false) {
+        alertBox.innerText = message;
+        alertBox.style.display = "block";
+        if (isSuccess) {
+          alertBox.style.backgroundColor = "#dcfce7";
+          alertBox.style.color = "#166534";
+          alertBox.style.border = "1px solid #bbf7d0";
+        } else {
+          alertBox.style.backgroundColor = "#fef2f2";
+          alertBox.style.color = "#991b1b";
+          alertBox.style.border = "1px solid #fecaca";
+        }
+      }
 
-          try {
-            const res = await fetch(`${API_BASE_URL}/login`, {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-                "ngrok-skip-browser-warning": "69420",
-              },
-              credentials: "include",
-              body: JSON.stringify({
-                username: document.getElementById("username").value,
-                password: document.getElementById("password").value,
-              }),
-            });
+      // --- Chuyển Đổi Màn Hình Đăng Nhập / Đăng Ký ---
+      showRegisterLink.addEventListener("click", () => {
+        loginForm.style.display = "none";
+        registerForm.style.display = "block";
+        formTitle.innerText = "Đăng ký tài khoản";
+        alertBox.style.display = "none";
+      });
 
-            const data = await res.json();
+      showLoginLink.addEventListener("click", () => {
+        registerForm.style.display = "none";
+        loginForm.style.display = "block";
+        formTitle.innerText = "Đăng nhập";
+        alertBox.style.display = "none";
+      });
 
-            if (data && data.status === "success") {
-              window.location.href = "trangchu.html";
-            } else {
-              alertBox.innerText = data?.message || "Sai thông tin!";
-              alertBox.style.display = "block";
-              btn.disabled = false;
-              btn.innerText = "Đang nhập";
-            }
-          } catch (error) {
-            alertBox.innerText = "Lỗi kết nối máy chủ!";
-            alertBox.style.display = "block";
+      // --- Xử lý Đăng Nhập ---
+      loginForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const btn = document.getElementById("btnLogin");
+
+        alertBox.style.display = "none";
+        btn.disabled = true;
+        btn.innerText = "Đang xác thực...";
+
+        try {
+          const res = await fetch(`${API_BASE_URL}/login`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "ngrok-skip-browser-warning": "69420",
+            },
+            credentials: "include",
+            body: JSON.stringify({
+              username: document.getElementById("username").value,
+              password: document.getElementById("password").value,
+            }),
+          });
+
+          const data = await res.json();
+
+          if (data && data.status === "success") {
+            window.location.href = "trangchu.html";
+          } else {
+            showAlert(data?.message || "Sai thông tin!");
             btn.disabled = false;
             btn.innerText = "Đăng nhập";
           }
-        });
+        } catch (error) {
+          showAlert("Lỗi kết nối máy chủ!");
+          btn.disabled = false;
+          btn.innerText = "Đăng nhập";
+        }
+      });
+
+      // --- Xử lý Đăng Ký ---
+      registerForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const btn = document.getElementById("btnRegister");
+
+        alertBox.style.display = "none";
+        btn.disabled = true;
+        btn.innerText = "Đang xử lý...";
+
+        const payload = {
+          username: document.getElementById("reg_username").value,
+          email: document.getElementById("reg_email").value,
+          HovaTen: document.getElementById("reg_HovaTen").value,
+          SoDienThoai: document.getElementById("reg_SoDienThoai").value,
+          password: document.getElementById("reg_password").value,
+          TenNganHang: document.getElementById("reg_TenNganHang").value,
+          SoTaiKhoan: document.getElementById("reg_SoTaiKhoan").value,
+        };
+
+        try {
+          const res = await fetch(`${API_BASE_URL}/register`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "ngrok-skip-browser-warning": "69420",
+            },
+            body: JSON.stringify(payload),
+          });
+
+          const data = await res.json();
+
+          if (data && data.status === "success") {
+            // Hiển thị thông báo thành công và chuyển về màn login
+            showAlert("Đăng ký thành công! Vui lòng đăng nhập.", true);
+            registerForm.reset(); // Xoá trắng form
+            setTimeout(() => {
+              showLoginLink.click();
+            }, 1500);
+          } else {
+            showAlert(data?.message || "Đăng ký không thành công!");
+          }
+        } catch (error) {
+          showAlert("Lỗi kết nối máy chủ!");
+        } finally {
+          btn.disabled = false;
+          btn.innerText = "Đăng ký";
+        }
+      });
     </script>
   </body>
 </html>
