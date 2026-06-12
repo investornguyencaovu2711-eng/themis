@@ -366,13 +366,12 @@
           </div>
 
           <div class="dropdown-menu" id="dropdownMenu">
-            <div
-              id="btnGoDashboard"
+            <a
+              href="https://quintet-rickety-scuba.ngrok-free.dev/dashboardquy"
               class="dropdown-item"
-              style="cursor: pointer"
             >
               <span>📊</span> Dashboard
-            </div>
+            </a>
           </div>
         </div>
       </div>
@@ -462,9 +461,6 @@
             headers: { "ngrok-skip-browser-warning": "69420" },
           });
           if (!res.ok) {
-            alert(
-              "Bạn chưa được xét duyệt hoặc lỗi đăng nhập, hãy quay lại sau!",
-            );
             window.location.href = "login.html";
             return;
           }
@@ -509,35 +505,6 @@
       });
 
       document.addEventListener("DOMContentLoaded", loadProfile);
-
-      //chuyển hướng dashboard
-      document
-        .getElementById("btnGoDashboard")
-        .addEventListener("click", async () => {
-          try {
-            // Gọi API lấy file HTML của Dashboard và truyền header vượt rào Ngrok
-            const res = await fetch(`${API_BASE_URL}/dashboardquy`, {
-              method: "GET",
-              headers: { "ngrok-skip-browser-warning": "69420" },
-            });
-
-            if (res.ok) {
-              const html = await res.text();
-
-              // Ghi đè toàn bộ nội dung file HTML nhận được lên trang hiện hành
-              document.open();
-              document.write(html);
-              document.close();
-
-              // (Tuỳ chọn) Đổi lại URL hiển thị trên thanh địa chỉ cho đẹp
-              window.history.pushState({}, "", "/dashboardquy");
-            } else {
-              console.error("Không thể tải trang Dashboard");
-            }
-          } catch (err) {
-            console.error("Lỗi khi chuyển trang:", err);
-          }
-        });
     </script>
   </body>
 </html>
