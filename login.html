@@ -25,7 +25,11 @@
       }
 
       body {
-        background-color: #f4f6f9;
+        /* Thiết lập hình nền chìm và phủ thêm một lớp màu trắng mờ 75% */
+        background:
+          linear-gradient(rgba(255, 255, 255, 0.75), rgba(255, 255, 255, 0.75)),
+          url("images/hinhnen.jpg") no-repeat center center fixed;
+        background-size: cover; /* Đảm bảo hình nền phủ kín màn hình */
         display: flex;
         justify-content: center;
         align-items: center;
@@ -40,8 +44,12 @@
         height: 100vh;
         height: 100dvh;
         max-height: 892px;
-        background-color: #ffffff;
-        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+        /* Thay vì màu trắng đặc, dùng trắng hơi trong suốt để thấy nhẹ hình nền phía sau */
+        background-color: rgba(255, 255, 255, 0.92);
+        backdrop-filter: blur(
+          10px
+        ); /* Tạo hiệu ứng kính mờ cho form (iOS/Hiện đại) */
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
         display: flex;
         flex-direction: column;
         overflow-y: auto;
@@ -58,6 +66,12 @@
           max-height: 100dvh;
           padding-top: env(safe-area-inset-top);
           padding-bottom: env(safe-area-inset-bottom);
+          background-color: rgba(
+            255,
+            255,
+            255,
+            0.85
+          ); /* Tăng độ trong suốt trên mobile */
         }
       }
 
@@ -176,7 +190,7 @@
     <div class="phone-container">
       <div class="login-wrap">
         <div class="brand-logo">
-          <img src="logo.webp" alt="Themis logo" class="logo-img" />
+          <img src="images/logo.webp" alt="Themis logo" class="logo-img" />
         </div>
 
         <div class="login-card">
@@ -204,13 +218,11 @@
       document
         .getElementById("loginForm")
         .addEventListener("submit", async (e) => {
-          // Ngăn chặn tải lại trang tuyệt đối
           e.preventDefault();
 
           const alertBox = document.getElementById("loginAlert");
           const btn = document.getElementById("btnLogin");
 
-          // Đưa giao diện về trạng thái chờ xử lý
           alertBox.style.display = "none";
           alertBox.innerText = "";
           btn.disabled = true;
@@ -221,7 +233,7 @@
               method: "POST",
               headers: {
                 "Content-Type": "application/json",
-                "ngrok-skip-browser-warning": "69420", // Bỏ qua trang trung gian của Ngrok
+                "ngrok-skip-browser-warning": "69420",
               },
               credentials: "include",
               body: JSON.stringify({
@@ -230,22 +242,17 @@
               }),
             });
 
-            // Vì Server luôn trả về mã 200, ta phân tích dữ liệu JSON ngay lập tức
             const data = await res.json();
 
-            // Kiểm tra thuộc tính status do Server định nghĩa
             if (data && data.status === "success") {
-              // Đăng nhập thành công, chuyển hướng trang
               window.location.href = "trangchu.html";
             } else {
-              // Đăng nhập thất bại hoặc Hệ thống đóng cửa (status === "error")
               alertBox.innerText = data?.message || "Sai thông tin!";
               alertBox.style.display = "block";
               btn.disabled = false;
-              btn.innerText = "Đăng nhập";
+              btn.innerText = "Đang nhập";
             }
           } catch (error) {
-            // Chỉ nhảy vào đây khi mất kết nối mạng hoàn toàn hoặc Server sập nguồn
             alertBox.innerText = "Lỗi kết nối máy chủ!";
             alertBox.style.display = "block";
             btn.disabled = false;
