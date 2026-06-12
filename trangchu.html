@@ -461,6 +461,9 @@
             headers: { "ngrok-skip-browser-warning": "69420" },
           });
           if (!res.ok) {
+            alert(
+              "Tài khoản đang xác thực hoặc lỗi đăng nhập. Hãy quay lại sau!",
+            );
             window.location.href = "login.html";
             return;
           }
