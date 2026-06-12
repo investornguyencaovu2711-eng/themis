@@ -200,35 +200,52 @@
     </div>
     <script>
       const API_BASE_URL = "https://quintet-rickety-scuba.ngrok-free.dev";
+
       document
         .getElementById("loginForm")
         .addEventListener("submit", async (e) => {
+          // Ngăn chặn tải lại trang tuyệt đối
           e.preventDefault();
+
           const alertBox = document.getElementById("loginAlert");
           const btn = document.getElementById("btnLogin");
+
+          // Đưa giao diện về trạng thái chờ xử lý
           alertBox.style.display = "none";
+          alertBox.innerText = "";
           btn.disabled = true;
           btn.innerText = "Đang xác thực...";
+
           try {
             const res = await fetch(`${API_BASE_URL}/login`, {
               method: "POST",
-              headers: { "Content-Type": "application/json" },
+              headers: {
+                "Content-Type": "application/json",
+                "ngrok-skip-browser-warning": "69420", // Bỏ qua trang trung gian của Ngrok
+              },
               credentials: "include",
               body: JSON.stringify({
                 username: document.getElementById("username").value,
                 password: document.getElementById("password").value,
               }),
             });
+
+            // Vì Server luôn trả về mã 200, ta phân tích dữ liệu JSON ngay lập tức
             const data = await res.json();
-            if (res.ok) {
+
+            // Kiểm tra thuộc tính status do Server định nghĩa
+            if (data && data.status === "success") {
+              // Đăng nhập thành công, chuyển hướng trang
               window.location.href = "trangchu.html";
             } else {
-              alertBox.innerText = data.message || "Sai thông tin!";
+              // Đăng nhập thất bại hoặc Hệ thống đóng cửa (status === "error")
+              alertBox.innerText = data?.message || "Sai thông tin!";
               alertBox.style.display = "block";
               btn.disabled = false;
               btn.innerText = "Đăng nhập";
             }
-          } catch {
+          } catch (error) {
+            // Chỉ nhảy vào đây khi mất kết nối mạng hoàn toàn hoặc Server sập nguồn
             alertBox.innerText = "Lỗi kết nối máy chủ!";
             alertBox.style.display = "block";
             btn.disabled = false;
