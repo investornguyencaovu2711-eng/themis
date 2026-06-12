@@ -25,6 +25,7 @@
       }
 
       body {
+        /* Giữ lại ảnh nền mờ như cũ */
         background:
           linear-gradient(rgba(255, 255, 255, 0.75), rgba(255, 255, 255, 0.75)),
           url("images/hinhnen.jpg") no-repeat center center fixed;
@@ -43,9 +44,10 @@
         height: 100vh;
         height: 100dvh;
         max-height: 892px;
+        /* Giữ lại hiệu ứng kính mờ (glassmorphism) */
         background-color: rgba(255, 255, 255, 0.92);
         backdrop-filter: blur(10px);
-        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
         display: flex;
         flex-direction: column;
         overflow-y: auto;
@@ -83,6 +85,7 @@
         text-align: center;
         margin-bottom: 20px;
       }
+
       .brand-logo .logo-img {
         width: 150px;
         height: auto;
@@ -94,7 +97,7 @@
       .login-card h2 {
         font-size: 24px;
         margin-bottom: 24px;
-        color: #1e293b;
+        color: #1a202c; /* Đồng bộ màu text với trang chủ */
         font-weight: 700;
         text-align: center;
       }
@@ -102,11 +105,12 @@
       .form-group {
         margin-bottom: 20px;
       }
+
       label {
         display: block;
         font-size: 13px;
         font-weight: 600;
-        color: #64748b;
+        color: #718096; /* Đồng bộ màu xám với trang chủ */
         margin-bottom: 8px;
         text-transform: uppercase;
         letter-spacing: 0.5px;
@@ -117,21 +121,23 @@
       input {
         width: 100%;
         padding: 14px 16px;
-        border: 1px solid #cbd5e1;
+        border: 1px solid #e2e8f0;
         border-radius: 12px;
         font-size: 16px !important;
         font-weight: 600;
         outline: none;
-        background-color: #ffffff;
+        background-color: #f8fafc;
+        color: #1a202c;
         transition: all 0.2s ease;
         appearance: none;
         -webkit-user-select: text;
         user-select: text;
       }
+
       input:focus {
         border-color: #2563eb;
         box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
-        background-color: #fff;
+        background-color: #ffffff;
       }
 
       button,
@@ -156,12 +162,15 @@
         user-select: none;
         background-color: #2563eb;
         margin-top: 10px;
+        box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
       }
+
       button:active,
       .btn-login:active {
         opacity: 0.8;
         transform: scale(0.98);
       }
+
       button:disabled {
         opacity: 0.7;
         pointer-events: none;
@@ -179,7 +188,6 @@
         text-align: center;
       }
 
-      /* CSS cho phần chuyển đổi Đăng nhập/Đăng ký */
       .toggle-link {
         display: block;
         text-align: center;
@@ -190,6 +198,7 @@
         cursor: pointer;
         text-decoration: none;
       }
+
       .toggle-link:hover {
         text-decoration: underline;
       }
