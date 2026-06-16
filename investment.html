@@ -21,7 +21,8 @@
       }
 
       body {
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+        font-family:
+          -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
           "Helvetica Neue", Arial, sans-serif;
         background-color: #f4f6f9;
         display: flex;
@@ -170,7 +171,9 @@
             </div>
             <div style="text-align: right">
               <div class="row-val" id="lblProfit">+0 VND</div>
-              <div class="row-val" style="font-size: 12px" id="lblRate">(0%)</div>
+              <div class="row-val" style="font-size: 12px" id="lblRate">
+                (0%)
+              </div>
             </div>
           </div>
           <div class="row">
@@ -194,6 +197,14 @@
             headers: { "ngrok-skip-browser-warning": "69420" },
           });
           if (!res.ok) {
+            try {
+              const errData = await res.json();
+              // Lấy thông tin lỗi từ key "error" mà Python trả về
+              alert(errData.error || "Có lỗi xảy ra, vui lòng đăng nhập lại!");
+            } catch (e) {
+              // Phòng trường hợp server trả về lỗi nhưng không dạng JSON
+              alert("Lỗi hệ thống. Vui lòng thử lại sau!");
+            }
             window.location.href = "login.html";
             return;
           }

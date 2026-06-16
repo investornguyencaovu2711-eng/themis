@@ -340,6 +340,14 @@
             headers: { "ngrok-skip-browser-warning": "69420" },
           });
           if (!res.ok) {
+            try {
+              const errData = await res.json();
+              // Lấy thông tin lỗi từ key "error" mà Python trả về
+              alert(errData.error || "Có lỗi xảy ra, vui lòng đăng nhập lại!");
+            } catch (e) {
+              // Phòng trường hợp server trả về lỗi nhưng không dạng JSON
+              alert("Lỗi hệ thống. Vui lòng thử lại sau!");
+            }
             window.location.href = "login.html";
             return;
           }
