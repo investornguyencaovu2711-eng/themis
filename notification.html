@@ -1,0 +1,421 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0, viewport-fit=cover"
+    />
+    <title>Thông báo</title>
+    <style>
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+        -webkit-tap-highlight-color: transparent;
+        font-family:
+          -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      }
+
+      html {
+        -webkit-text-size-adjust: 100%;
+        text-size-adjust: 100%;
+      }
+
+      body {
+        background-color: #f4f6f9;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        min-height: 100dvh;
+        overscroll-behavior: auto;
+      }
+
+      .phone-container {
+        width: 100%;
+        max-width: 412px;
+        height: 100vh;
+        height: 100dvh;
+        max-height: 892px;
+        background-color: #ffffff;
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        border-radius: 24px;
+        position: relative;
+        -webkit-overflow-scrolling: touch;
+      }
+
+      @media (max-width: 450px) {
+        .phone-container {
+          border-radius: 0;
+          max-height: 100dvh;
+          padding-top: env(safe-area-inset-top);
+          padding-bottom: env(safe-area-inset-bottom);
+        }
+      }
+
+      .header {
+        padding: 24px 20px 16px 20px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        border-bottom: 1px solid #f1f5f9;
+        background-color: #ffffff;
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        flex-shrink: 0;
+        -webkit-user-select: none;
+        user-select: none;
+      }
+      .back-btn {
+        font-size: 22px;
+        cursor: pointer;
+        text-decoration: none;
+        color: #1a202c;
+        padding: 4px;
+        border-radius: 8px;
+        transition: background-color 0.15s;
+        background: none;
+        border: none;
+      }
+      .back-btn:active {
+        background-color: #f1f5f9;
+      }
+      .header-title {
+        font-size: 18px;
+        font-weight: 700;
+        color: #0f172a;
+      }
+      .btn-read-all {
+        font-size: 13px;
+        color: #2563eb;
+        cursor: pointer;
+        background: none;
+        border: none;
+        font-weight: 600;
+        padding: 8px 12px;
+        border-radius: 8px;
+      }
+      .btn-read-all:active {
+        background-color: #f1f5f9;
+      }
+
+      /* ── CẤU TRÚC CHIA TẦNG (TRÊN / DƯỚI) ── */
+      .split-view-container {
+        display: flex;
+        flex-direction: column;
+        flex: 1;
+        overflow: hidden;
+      }
+
+      /* Khung trên: Danh sách 3 thông báo gần nhất (Chiều cao cố định tầm ~240px) */
+      .top-pane {
+        height: 242px;
+        overflow-y: auto;
+        background-color: #f8fafc;
+        border-bottom: 1px solid #e2e8f0;
+        -webkit-overflow-scrolling: touch;
+      }
+      .top-pane::-webkit-scrollbar {
+        width: 0px;
+        background: transparent;
+      }
+
+      /* Khung dưới: Chi tiết nội dung */
+      .bottom-pane {
+        flex: 1;
+        overflow-y: auto;
+        background-color: #ffffff;
+        padding: 20px;
+        -webkit-overflow-scrolling: touch;
+      }
+
+      /* Định hình item thông báo gọn gàng ở khung trên */
+      .notification-item {
+        padding: 14px 20px;
+        background-color: #ffffff;
+        border-bottom: 1px solid #f1f5f9;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        position: relative;
+        cursor: pointer;
+        transition: background-color 0.15s ease;
+      }
+      .notification-item:active {
+        background-color: #f1f5f9;
+      }
+      .notification-item.active {
+        background-color: #e2e8f0 !important;
+      }
+      .notification-item.unread {
+        background-color: #eff6ff;
+      }
+      .notification-item.unread::before {
+        content: "";
+        position: absolute;
+        left: 6px;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 8px;
+        height: 8px;
+        background-color: #2563eb;
+        border-radius: 50%;
+      }
+
+      .icon-wrapper {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 16px;
+        flex-shrink: 0;
+      }
+      .icon-transaction {
+        background-color: #ebf5ff;
+        color: #1a56db;
+      }
+      .icon-system {
+        background-color: #fef3c7;
+        color: #b45309;
+      }
+      .icon-default {
+        background-color: #f1f5f9;
+        color: #475569;
+      }
+
+      .noti-content {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+        min-width: 0;
+      }
+      .noti-title {
+        font-size: 14px;
+        font-weight: 600;
+        color: #1a202c;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+      .noti-time {
+        font-size: 11px;
+        color: #94a3b8;
+      }
+
+      /* Giao diện khung chi tiết phía dưới */
+      .info-box-detail {
+        background-color: #f8fafc;
+        border-radius: 16px;
+        padding: 16px;
+        border: 1px solid #e2e8f0;
+        min-height: 100%;
+        display: flex;
+        flex-direction: column;
+      }
+      .detail-placeholder {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        flex: 1;
+        color: #94a3b8;
+        font-size: 14px;
+        text-align: center;
+        gap: 12px;
+        padding: 40px 20px;
+      }
+      .detail-header {
+        border-bottom: 1px solid #e2e8f0;
+        padding-bottom: 12px;
+        margin-bottom: 14px;
+      }
+      .detail-title {
+        font-size: 16px;
+        font-weight: 700;
+        color: #0f172a;
+        line-height: 1.4;
+        margin-bottom: 4px;
+      }
+      .detail-time {
+        font-size: 12px;
+        color: #94a3b8;
+      }
+      .detail-body {
+        font-size: 14px;
+        color: #475569;
+        line-height: 1.6;
+        white-space: pre-wrap;
+        word-break: break-word;
+      }
+
+      .empty-state {
+        text-align: center;
+        padding: 40px 20px;
+        color: #94a3b8;
+        font-size: 14px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="phone-container">
+      <div class="header">
+        <button
+          class="back-btn"
+          onclick="window.location.href = 'trangchu.html'"
+        >
+          🔙
+        </button>
+        <div class="header-title">Thông báo</div>
+        <button class="btn-read-all" id="btnReadAll">Đọc tất cả</button>
+      </div>
+
+      <div class="split-view-container">
+        <div class="top-pane" id="notificationContainer">
+          <div class="empty-state">Đang tải thông báo...</div>
+        </div>
+
+        <div class="bottom-pane" id="detailContainer">
+          <div class="detail-placeholder">
+            <span style="font-size: 32px">📬</span>
+            <div>Chọn một thông báo ở phía trên để xem nội dung chi tiết.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const API_BASE_URL = "https://quintet-rickety-scuba.ngrok-free.dev";
+      let localNotifications = [];
+
+      function getIconTemplate(type) {
+        if (type === "transaction")
+          return `<div class="icon-wrapper icon-transaction">💰</div>`;
+        if (type === "system")
+          return `<div class="icon-wrapper icon-system">💰</div>`;
+        return `<div class="icon-wrapper icon-default">🔔</div>`;
+      }
+
+      async function fetchNotifications() {
+        const container = document.getElementById("notificationContainer");
+        try {
+          const res = await fetch(`${API_BASE_URL}/api/notifications`, {
+            method: "GET",
+            credentials: "include",
+            headers: { "ngrok-skip-browser-warning": "69420" },
+          });
+
+          if (!res.ok) {
+            window.location.href = "login.html";
+            return;
+          }
+
+          const data = await res.json();
+          localNotifications = data.notifications || [];
+          renderListView();
+        } catch (err) {
+          console.error(err);
+          container.innerHTML = `<div class="empty-state" style="color: #dc2626;">Không thể kết nối đến máy chủ!</div>`;
+        }
+      }
+
+      function renderListView() {
+        const container = document.getElementById("notificationContainer");
+        if (localNotifications.length === 0) {
+          container.innerHTML = `<div class="empty-state">Bạn chưa có thông báo nào.</div>`;
+          return;
+        }
+
+        container.innerHTML = "";
+        localNotifications.forEach((noti) => {
+          const isUnreadClass = noti.is_read === 0 ? "unread" : "";
+          const iconHtml = getIconTemplate(noti.type);
+
+          // Lược bỏ bớt phần "noti-snippet" (nội dung rút gọn) để khung trên thanh thoát, chỉ giữ title và time
+          const itemHtml = `
+            <div class="notification-item ${isUnreadClass}" id="noti-${noti.id}" onclick="selectNotification(${noti.id})">
+              ${iconHtml}
+              <div class="noti-content">
+                <div class="noti-title">${noti.title}</div>
+                <div class="noti-time">⏰ ${noti.created_at}</div>
+              </div>
+            </div>
+          `;
+          container.innerHTML += itemHtml;
+        });
+      }
+
+      async function selectNotification(id) {
+        const noti = localNotifications.find((n) => n.id === id);
+        if (!noti) return;
+
+        document
+          .querySelectorAll(".notification-item")
+          .forEach((el) => el.classList.remove("active"));
+        const activeItem = document.getElementById(`noti-${id}`);
+        if (activeItem) activeItem.classList.add("active");
+
+        // Đổ nội dung chi tiết vào Khung dưới và bọc trong hộp "info-box-detail" đồng bộ style transaction
+        const detailContainer = document.getElementById("detailContainer");
+        detailContainer.innerHTML = `
+          <div class="info-box-detail">
+            <div class="detail-header">
+              <div class="detail-title">${noti.title}</div>
+              <div class="detail-time">Thời gian nhận: ${noti.created_at}</div>
+            </div>
+            <div class="detail-body">${noti.body}</div>
+          </div>
+        `;
+
+        if (noti.is_read === 0) {
+          try {
+            const res = await fetch(
+              `${API_BASE_URL}/api/notifications/read/${id}`,
+              {
+                method: "POST",
+                credentials: "include",
+              },
+            );
+            if (res.ok) {
+              noti.is_read = 1;
+              if (activeItem) activeItem.classList.remove("unread");
+            }
+          } catch (err) {
+            console.error("Lỗi cập nhật trạng thái đã đọc:", err);
+          }
+        }
+      }
+
+      document
+        .getElementById("btnReadAll")
+        .addEventListener("click", async () => {
+          try {
+            const res = await fetch(
+              `${API_BASE_URL}/api/notifications/read-all`,
+              {
+                method: "POST",
+                credentials: "include",
+              },
+            );
+            if (res.ok) {
+              localNotifications.forEach((n) => (n.is_read = 1));
+              renderListView();
+            }
+          } catch (err) {
+            console.error(err);
+          }
+        });
+
+      document.addEventListener("DOMContentLoaded", fetchNotifications);
+    </script>
+  </body>
+</html>
