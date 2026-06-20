@@ -343,6 +343,7 @@
                 <div class="tx-left">
                   <div class="tx-title">${tx["Nop/Rut"]} tiền (${tx["CCQ"]} CCQ)</div>
                   <div class="tx-date">${tx.created_at}</div>
+                  <div class="tx-date">Nội dung: ${tx["NoiDungChuyenKhoan"]}</div>
                 </div>
                 <div class="tx-right">
                   <div class="tx-amount" style="${isHuy ? "text-decoration:line-through;color:#94a3b8;" : "color:#10b981;"}">${tx["Nop/Rut"] === "Nộp" ? "+" : "-"}${tx.tien}</div>
