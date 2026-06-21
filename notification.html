@@ -315,6 +315,21 @@
           });
 
           if (!res.ok) {
+            let errorMessage =
+              "Phiên làm việc không hợp lệ. Vui lòng đăng nhập lại!";
+            try {
+              // Thử đọc dữ liệu JSON để lấy thông điệp lỗi cụ thể từ app.py
+              const errorData = await res.json();
+              if (errorData && errorData.error) {
+                errorMessage = errorData.error;
+              }
+            } catch (jsonErr) {
+              // Phòng trường hợp backend lỗi không trả về đúng định dạng JSON
+              console.error("Không thể parse dữ liệu lỗi JSON:", jsonErr);
+            }
+
+            // Hiển thị alert chứa nguyên văn lỗi từ backend gửi về
+            alert(errorMessage);
             window.location.href = "login.html";
             return;
           }

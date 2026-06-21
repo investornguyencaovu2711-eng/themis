@@ -387,7 +387,10 @@
           </div>
 
           <div class="dropdown-menu" id="dropdownMenu">
-            <a href="https://quintet-rickety-scuba.ngrok-free.dev/dashboardquy" class="dropdown-item">
+            <a
+              href="https://quintet-rickety-scuba.ngrok-free.dev/dashboardquy"
+              class="dropdown-item"
+            >
               <span>📊</span> Dashboard
             </a>
           </div>
@@ -479,6 +482,19 @@
             headers: { "ngrok-skip-browser-warning": "69420" },
           });
           if (!res.ok) {
+            try {
+              // Thử đọc dữ liệu JSON để lấy thông điệp lỗi cụ thể từ app.py
+              const errorData = await res.json();
+              if (errorData && errorData.error) {
+                errorMessage = errorData.error;
+              }
+            } catch (jsonErr) {
+              // Phòng trường hợp backend lỗi không trả về đúng định dạng JSON
+              console.error("Phiên đăng nhập không hợp lệ", jsonErr);
+            }
+
+            // Hiển thị alert chứa nguyên văn lỗi từ backend gửi về
+            alert(errorMessage);
             window.location.href = "login.html";
             return;
           }
