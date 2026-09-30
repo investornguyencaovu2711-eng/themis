@@ -447,6 +447,20 @@
             alert("Có lỗi hệ thống xảy ra khi tải file!");
           }
         });
+
+      // Bắt sự kiện người dùng bấm Back / Forward trên trình duyệt
+      window.addEventListener("pageshow", function (event) {
+        // event.persisted = true nghĩa là trang được tải ra từ bfcache (bộ nhớ tạm trình duyệt)
+        if (
+          event.persisted ||
+          (performance &&
+            performance.getEntriesByType("navigation")[0].type ===
+              "back_forward")
+        ) {
+          // Ép trình duyệt gọi lại API loadProfile để kiểm tra Token còn hợp lệ không
+          loadProfile();
+        }
+      });
     </script>
   </body>
 </html>
