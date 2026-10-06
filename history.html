@@ -356,7 +356,7 @@
                   <div class="tx-date">${tx.created_at}</div>
                 </div>
                 <div class="tx-right">
-                  <div class="tx-amount" style="color:#f59e0b;">${tx["Nop/Rut"] === "Nộp" ? "+" : "-"}${tx.tien}</div>
+                  <div class="tx-amount" style="color:#f59e0b;">${tx["Nop/Rut"] === "Nộp" ? "+" : "-"}${Number(tx.tien || 0).toLocaleString("en-US")}</div>
                   <span class="status status-pending">${tx.TrangThaiGiaoDich}</span>
                 </div>`;
                 txPendingBox.appendChild(div);
