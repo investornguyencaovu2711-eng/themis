@@ -189,51 +189,64 @@
 
     <script>
       const API_BASE_URL = "https://quintet-rickety-scuba.ngrok-free.dev";
+
+      function getAuthHeaders() {
+        const token = localStorage.getItem("session_token");
+        const headers = { "ngrok-skip-browser-warning": "69420" };
+        if (token) {
+          headers["Authorization"] = "Bearer " + token;
+          headers["X-Session-Token"] = token;
+        }
+        return headers;
+      }
+
       async function loadInvestmentData() {
         try {
           const res = await fetch(`${API_BASE_URL}/profile`, {
             method: "GET",
             credentials: "include",
-            headers: { "ngrok-skip-browser-warning": "69420" },
+            headers: getAuthHeaders(),
           });
           if (!res.ok) {
             try {
               const errData = await res.json();
-              // Lấy thông tin lỗi từ key "error" mà Python trả về
               alert(errData.error || "Có lỗi xảy ra, vui lòng đăng nhập lại!");
             } catch (e) {
-              // Phòng trường hợp server trả về lỗi nhưng không dạng JSON
               alert("Lỗi hệ thống. Vui lòng thử lại sau!");
             }
+            localStorage.removeItem("session_token");
             window.location.href = "login.html";
             return;
           }
           const data = await res.json();
-          const info = data.user_information;
+          const info = data.user_information || {};
 
           // Cập nhật các thông tin dữ liệu API lên trang mới
           document.getElementById("lblInvestVal").innerText =
-            info["Giá trị tài sản ròng"];
+            info["Giá trị tài sản ròng"] || "0 đ";
           document.getElementById("lblSubVon").innerText =
-            "Vốn: " + info["Tổng vốn"];
+            "Vốn: " + (info["Tổng vốn"] || "0");
           const profitText = info["Biên độ lãi"] ?? "";
           const profitEl = document.getElementById("lblProfit");
           const rateEl = document.getElementById("lblRate");
 
           profitEl.innerText = profitText;
-          rateEl.innerText = "(" + info["Hiệu suất"] + ")";
+          rateEl.innerText = "(" + (info["Hiệu suất"] || "0%") + ")";
 
           // Xác định lãi/lỗ dựa theo ký tự đầu tiên của chuỗi
-          const isNegative = profitText.trim().startsWith("-");
+          const isNegative = String(profitText).trim().startsWith("-");
           const colorClass = isNegative ? "profit-negative" : "profit-positive";
+          profitEl.classList.remove("profit-negative", "profit-positive");
+          rateEl.classList.remove("profit-negative", "profit-positive");
           profitEl.classList.add(colorClass);
           rateEl.classList.add(colorClass);
           document.getElementById("lblCcqCount").innerText =
-            info["Chứng chỉ quỹ nắm giữ (CCQ)"];
+            info["Chứng chỉ quỹ nắm giữ (CCQ)"] || "0.00";
           document.getElementById("lblNavPrice").innerText =
-            "Giá CCQ: " + data.GiaCCQ;
+            "Giá CCQ: " + (data.GiaCCQ || 0);
         } catch (err) {
           console.error(err);
+          localStorage.removeItem("session_token");
           window.location.href = "login.html";
         }
       }

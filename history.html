@@ -316,22 +316,31 @@
     <script>
       const API_BASE_URL = "https://quintet-rickety-scuba.ngrok-free.dev";
 
+      function getAuthHeaders() {
+        const token = localStorage.getItem("session_token");
+        const headers = { "ngrok-skip-browser-warning": "69420" };
+        if (token) {
+          headers["Authorization"] = "Bearer " + token;
+          headers["X-Session-Token"] = token;
+        }
+        return headers;
+      }
+
       async function loadHistoryData() {
         try {
           const res = await fetch(`${API_BASE_URL}/profile`, {
             method: "GET",
             credentials: "include",
-            headers: { "ngrok-skip-browser-warning": "69420" },
+            headers: getAuthHeaders(),
           });
           if (!res.ok) {
             try {
               const errData = await res.json();
-              // Lấy thông tin lỗi từ key "error" mà Python trả về
               alert(errData.error || "Có lỗi xảy ra, vui lòng đăng nhập lại!");
             } catch (e) {
-              // Phòng trường hợp server trả về lỗi nhưng không dạng JSON
               alert("Lỗi hệ thống. Vui lòng thử lại sau!");
             }
+            localStorage.removeItem("session_token");
             window.location.href = "login.html";
             return;
           }
@@ -392,6 +401,7 @@
           }
         } catch (err) {
           console.error(err);
+          localStorage.removeItem("session_token");
           window.location.href = "login.html";
         }
       }
@@ -399,10 +409,14 @@
       document
         .getElementById("btnLogout")
         .addEventListener("click", async () => {
-          await fetch(`${API_BASE_URL}/logout`, {
-            method: "POST",
-            credentials: "include",
-          });
+          try {
+            await fetch(`${API_BASE_URL}/logout`, {
+              method: "POST",
+              credentials: "include",
+              headers: getAuthHeaders(),
+            });
+          } catch (e) {}
+          localStorage.removeItem("session_token");
           window.location.href = "login.html";
         });
 
@@ -413,13 +427,12 @@
         .getElementById("btnDownloadCSV")
         .addEventListener("click", async () => {
           try {
-            // Gọi API bằng cơ chế credentials: "include" để mang theo session_cookie
             const response = await fetch(
               `${API_BASE_URL}/api/download-success-transactions`,
               {
                 method: "GET",
                 credentials: "include",
-                headers: { "ngrok-skip-browser-warning": "69420" },
+                headers: getAuthHeaders(),
               },
             );
 
@@ -428,18 +441,13 @@
               return;
             }
 
-            // Chuyển kết quả trả về thành dạng Blob dữ liệu để kích hoạt tải xuống trình duyệt
             const blob = await response.blob();
             const url = window.URL.createObjectURL(blob);
             const a = document.createElement("a");
             a.href = url;
-
-            // Đặt tên file mặc định
             a.download = `giao_dich_da_xu_ly_${new Date().toISOString().slice(0, 10)}.csv`;
             document.body.appendChild(a);
             a.click();
-
-            // Dọn dẹp bộ nhớ vùng chứa tạm
             document.body.removeChild(a);
             window.URL.revokeObjectURL(url);
           } catch (error) {
@@ -450,15 +458,12 @@
 
       // Bắt sự kiện người dùng bấm Back / Forward trên trình duyệt
       window.addEventListener("pageshow", function (event) {
-        // event.persisted = true nghĩa là trang được tải ra từ bfcache (bộ nhớ tạm trình duyệt)
+        const navEntries = (performance && performance.getEntriesByType) ? performance.getEntriesByType("navigation") : [];
         if (
           event.persisted ||
-          (performance &&
-            performance.getEntriesByType("navigation")[0].type ===
-              "back_forward")
+          (navEntries.length > 0 && navEntries[0].type === "back_forward")
         ) {
-          // Ép trình duyệt gọi lại API loadProfile để kiểm tra Token còn hợp lệ không
-          loadProfile();
+          loadHistoryData();
         }
       });
     </script>

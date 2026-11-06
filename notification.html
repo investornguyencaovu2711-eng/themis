@@ -297,6 +297,16 @@
       const API_BASE_URL = "https://quintet-rickety-scuba.ngrok-free.dev";
       let localNotifications = [];
 
+      function getAuthHeaders() {
+        const token = localStorage.getItem("session_token");
+        const headers = { "ngrok-skip-browser-warning": "69420" };
+        if (token) {
+          headers["Authorization"] = "Bearer " + token;
+          headers["X-Session-Token"] = token;
+        }
+        return headers;
+      }
+
       function getIconTemplate(type) {
         if (type === "transaction")
           return `<div class="icon-wrapper icon-transaction">💰</div>`;
@@ -311,25 +321,23 @@
           const res = await fetch(`${API_BASE_URL}/api/notifications`, {
             method: "GET",
             credentials: "include",
-            headers: { "ngrok-skip-browser-warning": "69420" },
+            headers: getAuthHeaders(),
           });
 
           if (!res.ok) {
             let errorMessage =
               "Phiên làm việc không hợp lệ. Vui lòng đăng nhập lại!";
             try {
-              // Thử đọc dữ liệu JSON để lấy thông điệp lỗi cụ thể từ app.py
               const errorData = await res.json();
               if (errorData && errorData.error) {
                 errorMessage = errorData.error;
               }
             } catch (jsonErr) {
-              // Phòng trường hợp backend lỗi không trả về đúng định dạng JSON
               console.error("Không thể parse dữ liệu lỗi JSON:", jsonErr);
             }
 
-            // Hiển thị alert chứa nguyên văn lỗi từ backend gửi về
             alert(errorMessage);
+            localStorage.removeItem("session_token");
             window.location.href = "login.html";
             return;
           }
@@ -355,7 +363,6 @@
           const isUnreadClass = noti.is_read === 0 ? "unread" : "";
           const iconHtml = getIconTemplate(noti.type);
 
-          // Lược bỏ bớt phần "noti-snippet" (nội dung rút gọn) để khung trên thanh thoát, chỉ giữ title và time
           const itemHtml = `
             <div class="notification-item ${isUnreadClass}" id="noti-${noti.id}" onclick="selectNotification(${noti.id})">
               ${iconHtml}
@@ -379,7 +386,6 @@
         const activeItem = document.getElementById(`noti-${id}`);
         if (activeItem) activeItem.classList.add("active");
 
-        // Đổ nội dung chi tiết vào Khung dưới và bọc trong hộp "info-box-detail" đồng bộ style transaction
         const detailContainer = document.getElementById("detailContainer");
         detailContainer.innerHTML = `
           <div class="info-box-detail">
@@ -398,6 +404,7 @@
               {
                 method: "POST",
                 credentials: "include",
+                headers: getAuthHeaders(),
               },
             );
             if (res.ok) {
@@ -419,6 +426,7 @@
               {
                 method: "POST",
                 credentials: "include",
+                headers: getAuthHeaders(),
               },
             );
             if (res.ok) {

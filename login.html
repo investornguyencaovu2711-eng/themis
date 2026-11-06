@@ -464,10 +464,11 @@
             method: "POST",
             headers: {
               "Content-Type": "application/json",
+              "ngrok-skip-browser-warning": "69420",
             },
             credentials: "include",
             body: JSON.stringify({
-              username: document.getElementById("username").value,
+              username: document.getElementById("username").value.trim(),
               password: document.getElementById("password").value,
             }),
           });
@@ -475,6 +476,10 @@
           const data = await res.json();
 
           if (data && data.status === "success") {
+            // Lưu token vào localStorage để vượt qua rào cản chặn Third-Party Cookies
+            if (data.token) {
+              localStorage.setItem("session_token", data.token);
+            }
             window.location.href = "trangchu.html";
           } else {
             showAlert(data?.message || "Sai thông tin!");
@@ -498,13 +503,13 @@
         btn.innerText = "Đang xử lý...";
 
         const payload = {
-          username: document.getElementById("reg_username").value,
-          email: document.getElementById("reg_email").value,
-          HovaTen: document.getElementById("reg_HovaTen").value,
-          SoDienThoai: document.getElementById("reg_SoDienThoai").value,
+          username: document.getElementById("reg_username").value.trim(),
+          email: document.getElementById("reg_email").value.trim(),
+          HovaTen: document.getElementById("reg_HovaTen").value.trim(),
+          SoDienThoai: document.getElementById("reg_SoDienThoai").value.trim(),
           password: document.getElementById("reg_password").value,
-          TenNganHang: document.getElementById("reg_TenNganHang").value,
-          SoTaiKhoan: document.getElementById("reg_SoTaiKhoan").value,
+          TenNganHang: document.getElementById("reg_TenNganHang").value.trim(),
+          SoTaiKhoan: document.getElementById("reg_SoTaiKhoan").value.trim(),
         };
 
         try {
@@ -512,6 +517,7 @@
             method: "POST",
             headers: {
               "Content-Type": "application/json",
+              "ngrok-skip-browser-warning": "69420",
             },
             body: JSON.stringify(payload),
           });

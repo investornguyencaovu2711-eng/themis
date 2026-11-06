@@ -474,58 +474,78 @@
     <script>
       const API_BASE_URL = "https://quintet-rickety-scuba.ngrok-free.dev";
 
+      // Lấy Headers xác thực (Bearer Token + Custom Token + ngrok warning bypass)
+      function getAuthHeaders() {
+        const token = localStorage.getItem("session_token");
+        const headers = {
+          "ngrok-skip-browser-warning": "69420"
+        };
+        if (token) {
+          headers["Authorization"] = "Bearer " + token;
+          headers["X-Session-Token"] = token;
+        }
+        return headers;
+      }
+
       async function loadProfile() {
         try {
           const res = await fetch(`${API_BASE_URL}/profile`, {
             method: "GET",
-            headers: { "ngrok-skip-browser-warning": "69420" },
+            headers: getAuthHeaders(),
             credentials: "include",
           });
+
           if (!res.ok) {
+            let errorMessage = "Phiên làm việc không hợp lệ hoặc đã hết hạn!";
             try {
-              // Thử đọc dữ liệu JSON để lấy thông điệp lỗi cụ thể từ app.py
               const errorData = await res.json();
               if (errorData && errorData.error) {
                 errorMessage = errorData.error;
               }
             } catch (jsonErr) {
-              // Phòng trường hợp backend lỗi không trả về đúng định dạng JSON
-              console.error("Phiên đăng nhập không hợp lệ", jsonErr);
+              console.error("Lỗi parse JSON phản hồi:", jsonErr);
             }
 
-            // Hiển thị alert chứa nguyên văn lỗi từ backend gửi về
             alert(errorMessage);
+            localStorage.removeItem("session_token");
             window.location.href = "login.html";
             return;
           }
-          const data = await res.json();
-          const info = data.user_information;
 
-          document.getElementById("lblHoVaTen").innerText = data.HoVaTen;
+          const data = await res.json();
+          const info = data.user_information || {};
+
+          document.getElementById("lblHoVaTen").innerText = data.HoVaTen || "";
           document.getElementById("lblNetAsset").innerText =
-            info["Giá trị tài sản ròng"];
+            info["Giá trị tài sản ròng"] || "0 đ";
           document.getElementById("lblCardSoTK").innerText =
-            info["Số tài khoản"];
+            info["Số tài khoản"] || "";
           document.getElementById("lblCardBank").innerText =
-            info["Ngân hàng"].toUpperCase();
+            (info["Ngân hàng"] || "").toUpperCase();
 
           // ── GỌI THÊM API THÔNG BÁO ĐỂ LẤY BADGE CHƯA ĐỌC ──
-          const notiRes = await fetch(`${API_BASE_URL}/api/notifications`, {
-            method: "GET",
-            credentials: "include",
-          });
-          if (notiRes.ok) {
-            const notiData = await notiRes.json();
-            const badge = document.getElementById("badgeUnread");
-            if (notiData.unread_count > 0) {
-              badge.innerText = notiData.unread_count;
-              badge.style.display = "block";
-            } else {
-              badge.style.display = "none";
+          try {
+            const notiRes = await fetch(`${API_BASE_URL}/api/notifications`, {
+              method: "GET",
+              headers: getAuthHeaders(),
+              credentials: "include",
+            });
+            if (notiRes.ok) {
+              const notiData = await notiRes.json();
+              const badge = document.getElementById("badgeUnread");
+              if (notiData && notiData.unread_count > 0) {
+                badge.innerText = notiData.unread_count;
+                badge.style.display = "block";
+              } else {
+                badge.style.display = "none";
+              }
             }
+          } catch (notiErr) {
+            console.warn("Không thể tải thông báo:", notiErr);
           }
         } catch (err) {
-          console.error(err);
+          console.error("Lỗi kết nối máy chủ:", err);
+          localStorage.removeItem("session_token");
           window.location.href = "login.html";
         }
       }
@@ -533,10 +553,16 @@
       document
         .getElementById("btnLogout")
         .addEventListener("click", async () => {
-          await fetch(`${API_BASE_URL}/logout`, {
-            method: "POST",
-            credentials: "include",
-          });
+          try {
+            await fetch(`${API_BASE_URL}/logout`, {
+              method: "POST",
+              headers: getAuthHeaders(),
+              credentials: "include",
+            });
+          } catch (e) {
+            console.error("Lỗi đăng xuất:", e);
+          }
+          localStorage.removeItem("session_token");
           window.location.href = "login.html";
         });
 
@@ -558,14 +584,11 @@
 
       // Bắt sự kiện người dùng bấm Back / Forward trên trình duyệt
       window.addEventListener("pageshow", function (event) {
-        // event.persisted = true nghĩa là trang được tải ra từ bfcache (bộ nhớ tạm trình duyệt)
+        const navEntries = (performance && performance.getEntriesByType) ? performance.getEntriesByType("navigation") : [];
         if (
           event.persisted ||
-          (performance &&
-            performance.getEntriesByType("navigation")[0].type ===
-              "back_forward")
+          (navEntries.length > 0 && navEntries[0].type === "back_forward")
         ) {
-          // Ép trình duyệt gọi lại API loadProfile để kiểm tra Token còn hợp lệ không
           loadProfile();
         }
       });

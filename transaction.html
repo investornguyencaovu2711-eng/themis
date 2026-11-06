@@ -307,6 +307,16 @@
       let actionType = "nap";
       let thucTeSoTien = 0;
 
+      function getAuthHeaders() {
+        const token = localStorage.getItem("session_token");
+        const headers = { "ngrok-skip-browser-warning": "69420" };
+        if (token) {
+          headers["Authorization"] = "Bearer " + token;
+          headers["X-Session-Token"] = token;
+        }
+        return headers;
+      }
+
       function initActionType() {
         const urlParams = new URLSearchParams(window.location.search);
         const action = urlParams.get("action");
@@ -338,27 +348,26 @@
           const res = await fetch(`${API_BASE_URL}/profile`, {
             method: "GET",
             credentials: "include",
-            headers: { "ngrok-skip-browser-warning": "69420" },
+            headers: getAuthHeaders(),
           });
           if (!res.ok) {
             try {
               const errData = await res.json();
-              // Lấy thông tin lỗi từ key "error" mà Python trả về
               alert(errData.error || "Có lỗi xảy ra, vui lòng đăng nhập lại!");
             } catch (e) {
-              // Phòng trường hợp server trả về lỗi nhưng không dạng JSON
               alert("Lỗi hệ thống. Vui lòng thử lại sau!");
             }
+            localStorage.removeItem("session_token");
             window.location.href = "login.html";
             return;
           }
           const data = await res.json();
 
-          giaCCQ = parseFloat(data.GiaCCQ);
+          giaCCQ = parseFloat(data.GiaCCQ) || 0;
           document.getElementById("lblGiaCCQ").innerText =
             giaCCQ.toLocaleString("en-US") + " VND / CCQ";
 
-          const info = data.user_information;
+          const info = data.user_information || {};
           ccqNamGiu = parseFloat(info["Chứng chỉ quỹ nắm giữ (CCQ)"] || 0);
 
           if (actionType === "rut") {
@@ -366,7 +375,7 @@
               ccqNamGiu.toFixed(2) + " CCQ";
           } else {
             document.getElementById("lblKhaDungVal").innerText =
-              info["Giá trị tài sản ròng"];
+              info["Giá trị tài sản ròng"] || "0 đ";
           }
         } catch (err) {
           console.error("Lỗi tải thông tin cấu hình:", err);
@@ -429,6 +438,7 @@
               method: "POST",
               body: formData,
               credentials: "include",
+              headers: getAuthHeaders(),
             });
 
             const resultText = await res.text();
@@ -437,19 +447,19 @@
               const profileRes = await fetch(`${API_BASE_URL}/profile`, {
                 method: "GET",
                 credentials: "include",
-                headers: { "ngrok-skip-browser-warning": "69420" },
+                headers: getAuthHeaders(),
               });
               const profileData = await profileRes.json();
-              const userEmail = profileData.user_information.Email || "";
+              const userEmail = (profileData.user_information && profileData.user_information.Email) || "";
 
               let nganHangHienThi = "";
               let soTaiKhoanHienThi = "";
 
               if (actionType === "rut") {
                 nganHangHienThi =
-                  profileData.user_information["Ngân hàng"] || "TPBank";
+                  (profileData.user_information && profileData.user_information["Ngân hàng"]) || "TPBank";
                 soTaiKhoanHienThi =
-                  profileData.user_information["Số tài khoản"] || "";
+                  (profileData.user_information && profileData.user_information["Số tài khoản"]) || "";
               } else {
                 nganHangHienThi = "TPBank";
                 soTaiKhoanHienThi = "00002716749";
