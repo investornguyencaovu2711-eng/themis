@@ -479,7 +479,6 @@
           const res = await fetch(`${API_BASE_URL}/profile`, {
             method: "GET",
             credentials: "include",
-            headers: { "ngrok-skip-browser-warning": "69420" },
           });
           if (!res.ok) {
             try {
@@ -513,7 +512,6 @@
           const notiRes = await fetch(`${API_BASE_URL}/api/notifications`, {
             method: "GET",
             credentials: "include",
-            headers: { "ngrok-skip-browser-warning": "69420" },
           });
           if (notiRes.ok) {
             const notiData = await notiRes.json();
