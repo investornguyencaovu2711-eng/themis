@@ -388,7 +388,7 @@
 
           <div class="dropdown-menu" id="dropdownMenu">
             <a
-              href="https://themisncv.duckdns.org/dashboardquy"
+              href="https://quintet-rickety-scuba.ngrok-free.dev/dashboardquy"
               class="dropdown-item"
             >
               <span>📊</span> Dashboard
@@ -472,12 +472,13 @@
     </div>
 
     <script>
-      const API_BASE_URL = "https://themisncv.duckdns.org";
+      const API_BASE_URL = "https://quintet-rickety-scuba.ngrok-free.dev";
 
       async function loadProfile() {
         try {
           const res = await fetch(`${API_BASE_URL}/profile`, {
             method: "GET",
+            headers: { "ngrok-skip-browser-warning": "69420" },
             credentials: "include",
           });
           if (!res.ok) {
