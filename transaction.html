@@ -301,7 +301,7 @@
     </div>
 
     <script>
-      const API_BASE_URL = "https://quintet-rickety-scuba.ngrok-free.dev";
+      const API_BASE_URL = "https://api.themis.id.vn";
       let giaCCQ = 0;
       let ccqNamGiu = 0;
       let actionType = "nap";
@@ -450,16 +450,23 @@
                 headers: getAuthHeaders(),
               });
               const profileData = await profileRes.json();
-              const userEmail = (profileData.user_information && profileData.user_information.Email) || "";
+              const userEmail =
+                (profileData.user_information &&
+                  profileData.user_information.Email) ||
+                "";
 
               let nganHangHienThi = "";
               let soTaiKhoanHienThi = "";
 
               if (actionType === "rut") {
                 nganHangHienThi =
-                  (profileData.user_information && profileData.user_information["Ngân hàng"]) || "TPBank";
+                  (profileData.user_information &&
+                    profileData.user_information["Ngân hàng"]) ||
+                  "TPBank";
                 soTaiKhoanHienThi =
-                  (profileData.user_information && profileData.user_information["Số tài khoản"]) || "";
+                  (profileData.user_information &&
+                    profileData.user_information["Số tài khoản"]) ||
+                  "";
               } else {
                 nganHangHienThi = "TPBank";
                 soTaiKhoanHienThi = "00002716749";
