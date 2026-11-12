@@ -387,15 +387,20 @@
         if (activeItem) activeItem.classList.add("active");
 
         const detailContainer = document.getElementById("detailContainer");
+
+        // 1. Tạo khung giao diện chi tiết thông báo
         detailContainer.innerHTML = `
           <div class="info-box-detail">
             <div class="detail-header">
               <div class="detail-title">${noti.title}</div>
               <div class="detail-time">Thời gian nhận: ${noti.created_at}</div>
             </div>
-            <div class="detail-body">${noti.body}</div>
+            <div class="detail-body" id="detailBodyContent"></div>
           </div>
         `;
+
+        // 2. Sử dụng innerHTML để trình duyệt tự động phân giải các thẻ HTML (URL, SĐT) đã được xử lý từ Backend
+        document.getElementById("detailBodyContent").innerHTML = noti.body;
 
         if (noti.is_read === 0) {
           try {
