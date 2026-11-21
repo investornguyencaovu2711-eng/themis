@@ -393,6 +393,9 @@
             >
               <span>📊</span> Dashboard
             </a>
+            <a href="info.html" class="dropdown-item">
+              <span>🛡️</span>Tài khoản
+            </a>
           </div>
         </div>
       </div>
@@ -475,23 +478,11 @@
       const API_BASE_URL = "https://api.themis.id.vn";
 
       // Lấy Headers xác thực (Bearer Token + Custom Token + ngrok warning bypass)
-      function getAuthHeaders() {
-        const token = localStorage.getItem("session_token");
-        const headers = {
-          "ngrok-skip-browser-warning": "69420",
-        };
-        if (token) {
-          headers["Authorization"] = "Bearer " + token;
-          headers["X-Session-Token"] = token;
-        }
-        return headers;
-      }
 
       async function loadProfile() {
         try {
           const res = await fetch(`${API_BASE_URL}/profile`, {
             method: "GET",
-            headers: getAuthHeaders(),
             credentials: "include",
           });
 
@@ -528,7 +519,6 @@
           try {
             const notiRes = await fetch(`${API_BASE_URL}/api/notifications`, {
               method: "GET",
-              headers: getAuthHeaders(),
               credentials: "include",
             });
             if (notiRes.ok) {
@@ -557,12 +547,13 @@
           try {
             await fetch(`${API_BASE_URL}/logout`, {
               method: "POST",
-              headers: getAuthHeaders(),
               credentials: "include",
             });
           } catch (e) {
             console.error("Lỗi đăng xuất:", e);
           }
+
+          // CHỈ XÓA TOKEN PHIÊN LÀM VIỆC, GIỮ LẠI saved_username ĐỂ HIỂN THỊ TRANG LOGIN
           localStorage.removeItem("session_token");
           window.location.href = "login.html";
         });

@@ -297,16 +297,6 @@
       const API_BASE_URL = "https://api.themis.id.vn";
       let localNotifications = [];
 
-      function getAuthHeaders() {
-        const token = localStorage.getItem("session_token");
-        const headers = { "ngrok-skip-browser-warning": "69420" };
-        if (token) {
-          headers["Authorization"] = "Bearer " + token;
-          headers["X-Session-Token"] = token;
-        }
-        return headers;
-      }
-
       function getIconTemplate(type) {
         if (type === "transaction")
           return `<div class="icon-wrapper icon-transaction">💰</div>`;
@@ -321,7 +311,6 @@
           const res = await fetch(`${API_BASE_URL}/api/notifications`, {
             method: "GET",
             credentials: "include",
-            headers: getAuthHeaders(),
           });
 
           if (!res.ok) {
@@ -409,7 +398,6 @@
               {
                 method: "POST",
                 credentials: "include",
-                headers: getAuthHeaders(),
               },
             );
             if (res.ok) {
@@ -431,7 +419,6 @@
               {
                 method: "POST",
                 credentials: "include",
-                headers: getAuthHeaders(),
               },
             );
             if (res.ok) {

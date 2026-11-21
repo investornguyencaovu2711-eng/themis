@@ -190,22 +190,11 @@
     <script>
       const API_BASE_URL = "https://api.themis.id.vn";
 
-      function getAuthHeaders() {
-        const token = localStorage.getItem("session_token");
-        const headers = { "ngrok-skip-browser-warning": "69420" };
-        if (token) {
-          headers["Authorization"] = "Bearer " + token;
-          headers["X-Session-Token"] = token;
-        }
-        return headers;
-      }
-
       async function loadInvestmentData() {
         try {
           const res = await fetch(`${API_BASE_URL}/profile`, {
             method: "GET",
             credentials: "include",
-            headers: getAuthHeaders(),
           });
           if (!res.ok) {
             try {
