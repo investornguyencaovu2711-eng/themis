@@ -307,6 +307,16 @@
       let actionType = "nap";
       let thucTeSoTien = 0;
 
+      function getAuthHeaders() {
+        const token = localStorage.getItem("session_token");
+        const headers = { "ngrok-skip-browser-warning": "69420" };
+        if (token) {
+          headers["Authorization"] = "Bearer " + token;
+          headers["X-Session-Token"] = token;
+        }
+        return headers;
+      }
+
       function initActionType() {
         const urlParams = new URLSearchParams(window.location.search);
         const action = urlParams.get("action");
@@ -338,6 +348,7 @@
           const res = await fetch(`${API_BASE_URL}/profile`, {
             method: "GET",
             credentials: "include",
+            headers: getAuthHeaders(),
           });
           if (!res.ok) {
             try {
@@ -427,6 +438,7 @@
               method: "POST",
               body: formData,
               credentials: "include",
+              headers: getAuthHeaders(),
             });
 
             const resultText = await res.text();
@@ -435,6 +447,7 @@
               const profileRes = await fetch(`${API_BASE_URL}/profile`, {
                 method: "GET",
                 credentials: "include",
+                headers: getAuthHeaders(),
               });
               const profileData = await profileRes.json();
               const userEmail =

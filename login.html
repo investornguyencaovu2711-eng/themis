@@ -6,7 +6,7 @@
       name="viewport"
       content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0, viewport-fit=cover"
     />
-    <title>Themis - Đăng nhập</title>
+    <title>Themis</title>
 
     <link
       rel="icon"
@@ -14,6 +14,21 @@
       type="image/webp"
       sizes="96x96"
     />
+    <link
+      rel="apple-touch-icon"
+      href="https://investornguyencaovu2711-eng.github.io/themis/images/logo.webp"
+    />
+
+    <!-- CẤU HÌNH TIÊU ĐỀ TRANG (SITE NAME) CHO GOOGLE SEARCH -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "name": "Themis",
+        "alternateName": ["Themis Investor", "Themis App"],
+        "url": "https://investornguyencaovu2711-eng.github.io/"
+      }
+    </script>
     <style>
       *,
       *::before,
@@ -26,7 +41,13 @@
           -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       }
 
+      html {
+        -webkit-text-size-adjust: 100%;
+        text-size-adjust: 100%;
+      }
+
       body {
+        /* Giữ lại ảnh nền mờ như cũ */
         background:
           linear-gradient(rgba(255, 255, 255, 0.75), rgba(255, 255, 255, 0.75)),
           url("images/hinhnen.jpg") no-repeat center center fixed;
@@ -36,6 +57,7 @@
         align-items: center;
         min-height: 100vh;
         min-height: 100dvh;
+        overscroll-behavior: auto;
       }
 
       .phone-container {
@@ -44,14 +66,18 @@
         height: 100vh;
         height: 100dvh;
         max-height: 892px;
+        /* Giữ lại hiệu ứng kính mờ (glassmorphism) */
         background-color: rgba(255, 255, 255, 0.92);
         backdrop-filter: blur(10px);
         box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
         display: flex;
         flex-direction: column;
         overflow-y: auto;
+        overflow-x: hidden;
         border-radius: 24px;
         position: relative;
+        -webkit-overflow-scrolling: touch;
+        /*overscroll-behavior-y: contain;*/
       }
 
       @media (max-width: 450px) {
@@ -60,7 +86,13 @@
           max-height: 100dvh;
           padding-top: env(safe-area-inset-top);
           padding-bottom: env(safe-area-inset-bottom);
+          background-color: rgba(255, 255, 255, 0.85);
         }
+      }
+
+      .phone-container::-webkit-scrollbar {
+        width: 0px;
+        background: transparent;
       }
 
       .login-wrap {
@@ -79,6 +111,7 @@
       .brand-logo .logo-img {
         width: 150px;
         height: auto;
+        margin-top: 15px;
         display: block;
         margin: 0 auto;
       }
@@ -86,72 +119,9 @@
       .login-card h2 {
         font-size: 24px;
         margin-bottom: 24px;
-        color: #1a202c;
+        color: #1a202c; /* Đồng bộ màu text với trang chủ */
         font-weight: 700;
         text-align: center;
-      }
-
-      /* Khung Dropdown chọn tài khoản */
-      .dropdown-box {
-        margin-bottom: 20px;
-      }
-
-      .account-select-wrapper {
-        display: flex;
-        gap: 8px;
-        align-items: center;
-      }
-
-      select.account-dropdown {
-        flex: 1;
-        padding: 14px 16px;
-        border: 1px solid #e2e8f0;
-        border-radius: 12px;
-        font-size: 15px;
-        font-weight: 600;
-        outline: none;
-        background-color: #f8fafc;
-        color: #1a202c;
-        cursor: pointer;
-      }
-
-      select.account-dropdown:focus {
-        border-color: #2563eb;
-        background-color: #ffffff;
-      }
-
-      .btn-delete-current {
-        padding: 0 14px;
-        height: 50px;
-        background-color: #fee2e2;
-        color: #dc2626;
-        border: 1px solid #fecaca;
-        border-radius: 12px;
-        font-size: 13px;
-        font-weight: 700;
-        cursor: pointer;
-        white-space: nowrap;
-        transition: background 0.2s;
-      }
-
-      .btn-delete-current:hover {
-        background-color: #fecaca;
-      }
-
-      .btn-add-new-acc {
-        background: none;
-        border: none;
-        color: #2563eb;
-        font-size: 13px;
-        font-weight: 600;
-        cursor: pointer;
-        padding: 4px 0;
-        margin-top: 6px;
-        display: inline-block;
-      }
-
-      .btn-add-new-acc:hover {
-        text-decoration: underline;
       }
 
       .form-group {
@@ -169,20 +139,37 @@
         transform: translateY(-50%);
         background: none;
         border: none;
+        padding: 0;
+        margin: 0;
+        min-height: auto;
+        width: auto;
+        box-shadow: none;
         cursor: pointer;
         color: #718096;
         display: flex;
         align-items: center;
+        justify-content: center;
+      }
+
+      .password-toggle:active {
+        transform: translateY(-50%) scale(1) !important;
+        opacity: 0.7;
+      }
+
+      .password-group input {
+        padding-right: 48px; /* Tránh text đè lên icon mắt */
       }
 
       label {
         display: block;
         font-size: 13px;
         font-weight: 600;
-        color: #718096;
+        color: #718096; /* Đồng bộ màu xám với trang chủ */
         margin-bottom: 8px;
         text-transform: uppercase;
         letter-spacing: 0.5px;
+        -webkit-user-select: none;
+        user-select: none;
       }
 
       input {
@@ -195,14 +182,19 @@
         outline: none;
         background-color: #f8fafc;
         color: #1a202c;
+        transition: all 0.2s ease;
+        appearance: none;
+        -webkit-user-select: text;
+        user-select: text;
       }
 
       input:focus {
         border-color: #2563eb;
-        background-color: #ffffff;
         box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        background-color: #ffffff;
       }
 
+      button,
       .btn-login {
         width: 100%;
         min-height: 52px;
@@ -213,14 +205,29 @@
         font-weight: 700;
         color: white;
         cursor: pointer;
+        transition:
+          opacity 0.15s ease,
+          transform 0.1s ease;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        text-decoration: none;
+        -webkit-user-select: none;
+        user-select: none;
         background-color: #2563eb;
         margin-top: 10px;
         box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
       }
 
+      button:active,
       .btn-login:active {
         opacity: 0.8;
         transform: scale(0.98);
+      }
+
+      button:disabled {
+        opacity: 0.7;
+        pointer-events: none;
       }
 
       .login-alert {
@@ -229,6 +236,9 @@
         font-size: 14px;
         margin-bottom: 20px;
         display: none;
+        background-color: #fef2f2;
+        color: #991b1b;
+        border: 1px solid #fecaca;
         text-align: center;
       }
 
@@ -241,6 +251,10 @@
         font-weight: 600;
         cursor: pointer;
         text-decoration: none;
+      }
+
+      .toggle-link:hover {
+        text-decoration: underline;
       }
     </style>
   </head>
@@ -255,44 +269,11 @@
           <h2 id="formTitle">Đăng nhập</h2>
           <div id="alertBox" class="login-alert"></div>
 
-          <!-- TRÌNH ĐƠN THẢ XUỐNG CHỌN TÀI KHOẢN ĐÃ LƯU -->
-          <div
-            id="savedAccountsSection"
-            class="dropdown-box"
-            style="display: none"
-          >
-            <label>Chọn tài khoản đã lưu</label>
-            <div class="account-select-wrapper">
-              <select id="accountDropdown" class="account-dropdown">
-                <!-- Các option tài khoản sẽ được render bằng JS -->
-              </select>
-              <button
-                type="button"
-                id="btnRemoveSelected"
-                class="btn-delete-current"
-                title="Xóa tài khoản này khỏi danh sách"
-              >
-                Xóa
-              </button>
-            </div>
-            <div>
-              <button
-                type="button"
-                class="btn-add-new-acc"
-                id="btnShowAddAccount"
-              >
-                + Đăng nhập tài khoản khác
-              </button>
-            </div>
-          </div>
-
           <form id="loginForm">
-            <!-- Ô nhập username (Chỉ hiện khi chưa có tài khoản nào hoặc khi bấm Thêm tài khoản khác) -->
-            <div class="form-group" id="usernameGroup">
+            <div class="form-group">
               <label>TÊN ĐĂNG NHẬP / EMAIL</label>
               <input type="text" id="username" required />
             </div>
-
             <div class="form-group">
               <label>MẬT KHẨU</label>
               <div class="password-group">
@@ -312,6 +293,7 @@
                     stroke-width="2"
                     stroke-linecap="round"
                     stroke-linejoin="round"
+                    class="eye-icon"
                   >
                     <path
                       d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"
@@ -343,7 +325,6 @@
             >
           </form>
 
-          <!-- Form đăng ký giữ nguyên -->
           <form id="registerForm" style="display: none">
             <div class="form-group">
               <label>TÊN ĐĂNG NHẬP</label>
@@ -363,11 +344,36 @@
             </div>
             <div class="form-group">
               <label>MẬT KHẨU</label>
-              <input type="password" id="reg_password" required />
+              <div class="password-group">
+                <input type="password" id="reg_password" required />
+                <button
+                  type="button"
+                  class="password-toggle"
+                  onclick="togglePassword('reg_password', this)"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    class="eye-icon"
+                  >
+                    <path
+                      d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"
+                    ></path>
+                    <circle cx="12" cy="12" r="3"></circle>
+                  </svg>
+                </button>
+              </div>
             </div>
             <div class="form-group">
               <label>TÊN NGÂN HÀNG</label>
-              <input type="text" id="reg_NganHang" required />
+              <input type="text" id="reg_TenNganHang" required />
             </div>
             <div class="form-group">
               <label>SỐ TÀI KHOẢN</label>
@@ -385,209 +391,163 @@
     </div>
 
     <script>
+      // --- Tự động chuyển hướng nếu đã có session_token ---
+      document.addEventListener("DOMContentLoaded", () => {
+        const token = localStorage.getItem("session_token");
+        if (token) {
+          window.location.href = "trangchu.html";
+        }
+      });
       const API_BASE_URL = "https://api.themis.id.vn";
 
-      // Khi trang tải xong: Đọc danh sách tài khoản đã lưu vào dropdown
-      document.addEventListener("DOMContentLoaded", () => {
-        renderDropdown();
-      });
+      // --- DOM Elements ---
+      const loginForm = document.getElementById("loginForm");
+      const registerForm = document.getElementById("registerForm");
+      const formTitle = document.getElementById("formTitle");
+      const alertBox = document.getElementById("alertBox");
 
-      function getSavedAccounts() {
-        try {
-          return (
-            JSON.parse(localStorage.getItem("themis_saved_accounts")) || []
-          );
-        } catch (e) {
-          return [];
-        }
-      }
+      const showRegisterLink = document.getElementById("showRegisterLink");
+      const showLoginLink = document.getElementById("showLoginLink");
 
-      function renderDropdown() {
-        const accounts = getSavedAccounts();
-        const section = document.getElementById("savedAccountsSection");
-        const dropdown = document.getElementById("accountDropdown");
-        const usernameGroup = document.getElementById("usernameGroup");
-        const usernameInput = document.getElementById("username");
-
-        if (accounts.length > 0) {
-          section.style.display = "block";
-          dropdown.innerHTML = "";
-
-          accounts.forEach((acc) => {
-            const opt = document.createElement("option");
-            opt.value = acc.username;
-            opt.textContent = `${acc.name || acc.username} (${acc.username})`;
-            dropdown.appendChild(opt);
-          });
-
-          // Ẩn ô nhập username đi, dùng giá trị từ dropdown
-          usernameGroup.style.display = "none";
-          usernameInput.removeAttribute("required");
-        } else {
-          // Nếu chưa có tài khoản nào được lưu -> Ẩn dropdown, hiện ô nhập input trắng
-          section.style.display = "none";
-          usernameGroup.style.display = "block";
-          usernameInput.setAttribute("required", "true");
-        }
-      }
-
-      // Xử lý sự kiện khi bấm nút "Xóa" tài khoản đang chọn trong dropdown
-      document
-        .getElementById("btnRemoveSelected")
-        .addEventListener("click", () => {
-          const dropdown = document.getElementById("accountDropdown");
-          const usernameToRemove = dropdown.value;
-          if (!usernameToRemove) return;
-
-          if (
-            confirm(
-              `Bạn có chắc muốn xóa tài khoản "${usernameToRemove}" khỏi danh sách đã lưu?`,
-            )
-          ) {
-            let accounts = getSavedAccounts();
-            accounts = accounts.filter(
-              (acc) => acc.username !== usernameToRemove,
-            );
-            localStorage.setItem(
-              "themis_saved_accounts",
-              JSON.stringify(accounts),
-            );
-
-            // Cập nhật lại giao diện dropdown
-            renderDropdown();
-            document.getElementById("password").value = "";
-          }
-        });
-
-      // Nút chuyển sang chế độ nhập tài khoản mới thủ công
-      document
-        .getElementById("btnShowAddAccount")
-        .addEventListener("click", () => {
-          const section = document.getElementById("savedAccountsSection");
-          const usernameGroup = document.getElementById("usernameGroup");
-          const usernameInput = document.getElementById("username");
-
-          section.style.display = "none"; // Ẩn dropdown tạm thời
-          usernameGroup.style.display = "block";
-          usernameInput.setAttribute("required", "true");
-          usernameInput.value = "";
-          document.getElementById("password").value = "";
-          usernameInput.focus();
-        });
-
+      // --- Hàm Ẩn / Hiện Mật Khẩu ---
       function togglePassword(inputId, button) {
         const passwordInput = document.getElementById(inputId);
+        const svgIcon = button.querySelector("svg");
+
         if (passwordInput.type === "password") {
           passwordInput.type = "text";
+          // Đổi sang icon Mắt gạch chéo khi hiện mật khẩu
+          svgIcon.innerHTML =
+            '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line>';
         } else {
           passwordInput.type = "password";
+          // Đổi lại icon Mắt bình thường khi ẩn mật khẩu
+          svgIcon.innerHTML =
+            '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle>';
         }
       }
 
+      // --- Hàm Tiện Ích Thông Báo ---
       function showAlert(message, isSuccess = false) {
-        const alertBox = document.getElementById("alertBox");
         alertBox.innerText = message;
         alertBox.style.display = "block";
-        alertBox.style.backgroundColor = isSuccess ? "#dcfce7" : "#fef2f2";
-        alertBox.style.color = isSuccess ? "#166534" : "#991b1b";
-        alertBox.style.border = isSuccess
-          ? "1px solid #bbf7d0"
-          : "1px solid #fecaca";
+        if (isSuccess) {
+          alertBox.style.backgroundColor = "#dcfce7";
+          alertBox.style.color = "#166534";
+          alertBox.style.border = "1px solid #bbf7d0";
+        } else {
+          alertBox.style.backgroundColor = "#fef2f2";
+          alertBox.style.color = "#991b1b";
+          alertBox.style.border = "1px solid #fecaca";
+        }
       }
 
-      document
-        .getElementById("showRegisterLink")
-        .addEventListener("click", () => {
-          document.getElementById("loginForm").style.display = "none";
-          document.getElementById("registerForm").style.display = "block";
-          document.getElementById("formTitle").innerText = "Đăng ký tài khoản";
-          document.getElementById("alertBox").style.display = "none";
-        });
-
-      document.getElementById("showLoginLink").addEventListener("click", () => {
-        document.getElementById("registerForm").style.display = "none";
-        document.getElementById("loginForm").style.display = "block";
-        document.getElementById("formTitle").innerText = "Đăng nhập";
-        document.getElementById("alertBox").style.display = "none";
+      // --- Chuyển Đổi Màn Hình Đăng Nhập / Đăng Ký ---
+      showRegisterLink.addEventListener("click", () => {
+        loginForm.style.display = "none";
+        registerForm.style.display = "block";
+        formTitle.innerText = "Đăng ký tài khoản";
+        alertBox.style.display = "none";
       });
 
-      // Xử lý gửi form Đăng nhập
-      document
-        .getElementById("loginForm")
-        .addEventListener("submit", async (e) => {
-          e.preventDefault();
-          const btn = document.getElementById("btnLogin");
-          document.getElementById("alertBox").style.display = "none";
-          btn.disabled = true;
-          btn.innerText = "Đang xác thực...";
+      showLoginLink.addEventListener("click", () => {
+        registerForm.style.display = "none";
+        loginForm.style.display = "block";
+        formTitle.innerText = "Đăng nhập";
+        alertBox.style.display = "none";
+      });
 
-          // Lấy username từ dropdown (nếu đang hiển thị) hoặc từ ô input thủ công
-          const dropdownSection = document.getElementById(
-            "savedAccountsSection",
-          );
-          let loginUsername = "";
-          if (dropdownSection.style.display !== "none") {
-            loginUsername = document.getElementById("accountDropdown").value;
-          } else {
-            loginUsername = document.getElementById("username").value.trim();
-          }
-          const loginPassword = document.getElementById("password").value;
-          const savedDeviceToken = localStorage.getItem(
-            "themis_trusted_device_token",
-          );
+      // --- Xử lý Đăng Nhập ---
+      loginForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const btn = document.getElementById("btnLogin");
 
-          try {
-            const res = await fetch(`${API_BASE_URL}/login`, {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              credentials: "include",
-              body: JSON.stringify({
-                username: loginUsername,
-                password: loginPassword,
-                device_token: savedDeviceToken,
-              }),
-            });
+        alertBox.style.display = "none";
+        btn.disabled = true;
+        btn.innerText = "Đang xác thực...";
 
-            const data = await res.json();
+        try {
+          const res = await fetch(`${API_BASE_URL}/login`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "ngrok-skip-browser-warning": "69420",
+            },
+            credentials: "include",
+            body: JSON.stringify({
+              username: document.getElementById("username").value.trim(),
+              password: document.getElementById("password").value,
+            }),
+          });
 
-            if (data && data.status === "success") {
-              // Lưu tài khoản đăng nhập thành công vào mảng danh sách trong localStorage
-              let accounts = getSavedAccounts();
-              const currentAcc = {
-                username: data.username || loginUsername,
-                name: data.HovaTen || loginUsername,
-              };
+          const data = await res.json();
 
-              const existingIndex = accounts.findIndex(
-                (acc) => acc.username === currentAcc.username,
-              );
-              if (existingIndex >= 0) {
-                accounts[existingIndex] = currentAcc; // Cập nhật thông tin mới nhất
-              } else {
-                accounts.unshift(currentAcc); // Đưa lên đầu danh sách
-              }
-
-              localStorage.setItem(
-                "themis_saved_accounts",
-                JSON.stringify(accounts),
-              );
-              if (data.token) {
-              }
-
-              window.location.href = "trangchu.html";
-            } else {
-              showAlert(data?.message || "Sai thông tin đăng nhập!");
-              btn.disabled = false;
-              btn.innerText = "Đăng nhập";
+          if (data && data.status === "success") {
+            // Lưu token vào localStorage để vượt qua rào cản chặn Third-Party Cookies
+            if (data.token) {
+              localStorage.setItem("session_token", data.token);
             }
-          } catch (error) {
-            showAlert("Lỗi kết nối máy chủ!");
+            window.location.href = "trangchu.html";
+          } else {
+            showAlert(data?.message || "Sai thông tin!");
             btn.disabled = false;
             btn.innerText = "Đăng nhập";
           }
-        });
+        } catch (error) {
+          showAlert("Lỗi kết nối máy chủ!");
+          btn.disabled = false;
+          btn.innerText = "Đăng nhập";
+        }
+      });
+
+      // --- Xử lý Đăng Ký ---
+      registerForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const btn = document.getElementById("btnRegister");
+
+        alertBox.style.display = "none";
+        btn.disabled = true;
+        btn.innerText = "Đang xử lý...";
+
+        const payload = {
+          username: document.getElementById("reg_username").value.trim(),
+          email: document.getElementById("reg_email").value.trim(),
+          HovaTen: document.getElementById("reg_HovaTen").value.trim(),
+          SoDienThoai: document.getElementById("reg_SoDienThoai").value.trim(),
+          password: document.getElementById("reg_password").value,
+          TenNganHang: document.getElementById("reg_TenNganHang").value.trim(),
+          SoTaiKhoan: document.getElementById("reg_SoTaiKhoan").value.trim(),
+        };
+
+        try {
+          const res = await fetch(`${API_BASE_URL}/register`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "ngrok-skip-browser-warning": "69420",
+            },
+            body: JSON.stringify(payload),
+          });
+
+          const data = await res.json();
+
+          if (data && data.status === "success") {
+            // Hiển thị thông báo thành công và chuyển về màn login
+            showAlert("Đăng ký thành công! Vui lòng đăng nhập.", true);
+            registerForm.reset(); // Xoá trắng form
+            setTimeout(() => {
+              showLoginLink.click();
+            }, 1500);
+          } else {
+            showAlert(data?.message || "Đăng ký không thành công!");
+          }
+        } catch (error) {
+          showAlert("Lỗi kết nối máy chủ!");
+        } finally {
+          btn.disabled = false;
+          btn.innerText = "Đăng ký";
+        }
+      });
     </script>
   </body>
 </html>
